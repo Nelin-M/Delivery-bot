@@ -1,0 +1,11 @@
+{
+  "start_phrase": "Привет!",
+  "help_phrase": "Чем могу помочь?",
+  "log_filename": "Delivery-bot.log",
+  "log_encoding": "utf-8",
+  "logging_date_format": "%Y-%m-%d %H:%M",
+  "logging_formats": {
+    "app": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "incoming": "%(asctime)s - %(name)s - %(message)s"
+  }
+}
