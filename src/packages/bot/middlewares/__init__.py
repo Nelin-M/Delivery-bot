@@ -1,5 +1,5 @@
 """
-This module is responsible for loading the configuration file for the bot and loading the environment variables.
+Setup class in middleware
 """
 
 from aiogram import Dispatcher
@@ -7,7 +7,6 @@ from aiogram import Dispatcher
 from .throttling import ThrottlingMiddleware
 
 
-#
 def setup(dispatcher: Dispatcher):
     """
     Installing anti-spam for a bot
