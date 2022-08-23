@@ -3,7 +3,7 @@ A module with the implementation of the main methods for logging.
 """
 import enum
 import logging
-from packages.loaders import config
+from src.packages.loaders import config
 
 __all__ = ["Log", "Loggers"]
 
