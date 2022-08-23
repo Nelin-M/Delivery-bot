@@ -1,7 +1,7 @@
 """
 This module contains Bot functions associated with answers.
 """
-from packages.logger import Log, Loggers
+from src.packages.logger import Log, Loggers
 
 __all__ = ["Bot"]
 
