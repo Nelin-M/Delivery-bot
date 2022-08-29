@@ -6,8 +6,8 @@ from aiogram import executor
 from src.packages.bot.chat_bot import Bot
 from src.packages.bot.handlers import dispatcher
 from src.packages.logger.logger import Log, Loggers
-from src.packages.other.bot_hints import bot_hints
-from src.packages.other.inform_admins import inform_admins
+from src.packages.bot.other.bot_hints import bot_hints
+from src.packages.bot.other.inform_admins import inform_admins
 
 logger = Log()
 logger.info(Loggers.APP.value, "Bot session started;")
