@@ -7,7 +7,7 @@ from aiogram import Dispatcher
 from .throttling import ThrottlingMiddleware
 
 
-def setup(dispatcher: Dispatcher):
+def setup_middleware(dispatcher: Dispatcher):
     """
     Installing anti-spam for a bot
     @param dispatcher: dispatcher
