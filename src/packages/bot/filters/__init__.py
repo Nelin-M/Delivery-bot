@@ -7,7 +7,7 @@ from .only_for_group_members import GroupMember, NotGroupMember
 from .chat_only_with_a_bot import ChatWithABot
 
 
-def setup(dispatcher: Dispatcher):
+def setup_filters(dispatcher: Dispatcher):
     """
     Registration of filters
     """
