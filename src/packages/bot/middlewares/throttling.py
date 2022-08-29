@@ -44,16 +44,10 @@ class ThrottlingMiddleware(BaseMiddleware):
         """
         message_throttled
         """
-        handler = current_handler.get()
-        dispatcher = Dispatcher.get_current()
-        if handler:
-            key = getattr(handler, "throttling_key", f"{self.prefix}_{handler.__name__}")
-        else:
-            key = f"{self.prefix}_message"
+
         delta = throttled.rate - throttled.delta
-        if throttled.exceeded_count <= 2:
-            await message.reply("Too many requests! ")
+        if throttled.exceeded_count == 3:
+            await message.reply("Ты отправляешь команды слишком часто!!!")
+        elif throttled.exceeded_count == 4:
+            await message.reply("Отвечу тебе через 10 секунд!")
         await asyncio.sleep(delta)
-        thr = await dispatcher.check_key(key)
-        if thr.exceeded_count == throttled.exceeded_count:
-            await message.reply("Unlocked.")
