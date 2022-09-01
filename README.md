@@ -81,7 +81,7 @@ Rename the `.env.dist` file to `.env` and fill in the indicated fields.
 To enable pre-commit on the current repository:
 
 ```shell
- pre-commit install
+ poetry run pre-commit install
 ```
 
 #### Commands
