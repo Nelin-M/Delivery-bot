@@ -146,6 +146,7 @@ disable=print-statement,
         raise-missing-from,
         consider-iterating-dictionary,
         no-self-use
+        too-many-arguments
 
 
 # Enable the message, report, category or checker with the given id(s). You can
