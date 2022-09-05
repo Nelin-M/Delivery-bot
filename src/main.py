@@ -3,6 +3,7 @@ This file is the main one, the bot is launched from it.
 """
 from aiogram import executor
 
+from src.packages.database import database, setup_database
 from src.packages.bot.chat_bot import Bot
 from src.packages.bot.handlers import dispatcher
 from src.packages.bot.other.bot_hints import bot_hints
@@ -20,6 +21,9 @@ async def connecting_file(load_dispatcher):
     """
     The function adds additional functionality
     """
+
+    # pylint: disable=W0511
+    await setup_database(database)  # TODO: Не совсем понятен момент с инициализацией БД
 
     setup_filters(dispatcher)
     setup_middleware(dispatcher)
