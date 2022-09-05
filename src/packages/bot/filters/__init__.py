@@ -3,8 +3,7 @@ Initializing modules
 """
 
 from aiogram import Dispatcher
-from .only_for_group_members import GroupMember, NotGroupMember
-from .chat_only_with_a_bot import ChatWithABot
+from .users import ChatWithABot, GroupMember, AuthorisedUser
 
 
 def setup_filters(dispatcher: Dispatcher):
@@ -13,5 +12,5 @@ def setup_filters(dispatcher: Dispatcher):
     """
 
     dispatcher.filters_factory.bind(GroupMember)
-    dispatcher.filters_factory.bind(NotGroupMember)
+    dispatcher.filters_factory.bind(AuthorisedUser)
     dispatcher.filters_factory.bind(ChatWithABot)
