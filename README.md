@@ -1,4 +1,4 @@
-# Deliveery bot
+# Delivery bot
 
 ## Getting Started
 
@@ -94,3 +94,8 @@ To enable pre-commit on the current repository:
 ## Authors
 
 * **Nelin Maxim** – [GitHub](https://github.com/Nelin-M)
+* **Shatilova Daria** – [GitHub](https://github.com/solovyova-1996)
+* **Zharkov Valery** – [GitHub](https://github.com/Lykor)
+* **Manyakin Vyacheslav** – [GitHub](https://github.com/vmanyakin)
+* **Ramil Arsymbekov** – [GitHub](https://github.com/arsy-off)
+* **Wagner Roman** – [GitHub](https://github.com/Cartez55)
