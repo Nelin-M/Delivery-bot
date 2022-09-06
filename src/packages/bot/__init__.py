@@ -2,5 +2,5 @@
 Initialization file for the package __bot__.
 """
 
-from .chat_bot import *
+from .bot import *
 from .loader import *

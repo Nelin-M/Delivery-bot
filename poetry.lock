@@ -355,6 +355,17 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "emoji"
+version = "2.0.0"
+description = "Emoji for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+dev = ["pytest", "coverage", "coveralls"]
+
+[[package]]
 name = "entrypoints"
 version = "0.4"
 description = "Discover and load entry points from installed packages."
@@ -1552,7 +1563,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.x"
-content-hash = "97498902db82c5aa335cc09cbee57848f3402f64c823540eb63edd3f7c9e982d"
+content-hash = "3bd268c8d16d20e6bbe8f1b1af2d71a6fb2bcd7001d3146e02f98df8461a4684"
 
 [metadata.files]
 aiogram = []
@@ -1799,6 +1810,7 @@ defusedxml = [
     {file = "defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69"},
 ]
 distlib = []
+emoji = []
 entrypoints = [
     {file = "entrypoints-0.4-py3-none-any.whl", hash = "sha256:f174b5ff827504fd3cd97cc3f8649f3693f51538c7e4bdf3ef002c8429d42f9f"},
     {file = "entrypoints-0.4.tar.gz", hash = "sha256:b706eddaa9218a19ebcd67b56818f05bb27589b1ca9e8d797b74affad4ccacd4"},

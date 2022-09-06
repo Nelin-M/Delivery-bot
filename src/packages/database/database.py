@@ -5,7 +5,7 @@ from typing import List
 from datetime import date, time
 from asyncpg import UniqueViolationError
 from src.packages.database.shemas import User, RideRequest, Car, TgProfile, db
-from src.packages.logger import Loggers, Log
+from src.packages.logger import Loggers, logger
 from src.packages.loaders import env_variables
 
 __all__ = ["Database"]
@@ -17,7 +17,7 @@ class DatabaseException(Exception):
     """
 
 
-# pylint:disable=R0904
+# pylint: disable=R0904:
 class Database:
     """
     Database class.The class contains the necessary
@@ -25,22 +25,23 @@ class Database:
     """
 
     def __init__(self):
-        self.host = env_variables.get("DATABASE_HOST")
-        self.user = env_variables.get("DATABASE_NAME")
-        self.password = env_variables.get("DATABASE_USER")
-        self.db_name = env_variables.get("DATABASE_PASSWORD")
-        # self.__connect_db()
-        # self.__create_tables()
+        self.host = env_variables.get("POSTGRES_HOST")
+        self.user = env_variables.get("POSTGRES_DB")
+        self.password = env_variables.get("POSTGRES_USER")
+        self.db_name = env_variables.get("POSTGRES_PASSWORD")
+        self.port = env_variables.get("POSTGRES_PORT", default=5432)
 
     async def connect_db(self):
         """
-        Makes connection with a database
+        method to connect to postgres database
         """
         try:
-            await db.set_bind(f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}/{self.db_name}")
+            await db.set_bind(
+                f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}"
+            )
         # pylint: disable=W0703:
         except Exception as exception:
-            Log.critical(Loggers.APP.value, f"Unexpected error: {exception}")
+            logger.critical(Loggers.APP.value, f"Unexpected error: {exception}")
 
     @staticmethod
     # pylint: disable=W0238:
@@ -48,8 +49,8 @@ class Database:
         await db.gino.drop_all()
 
     @staticmethod
-    # pylint: disable=C0116,W0238:
-    async def create_tables():
+    # pylint: disable=W0238:
+    async def __create_tables():
         await db.gino.create_all()
 
     @staticmethod

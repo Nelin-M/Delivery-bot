@@ -10,6 +10,7 @@ from src.packages.bot.loader import dispatcher
 from src.packages.bot.keyboards import buttons
 from src.packages.database import database
 
+
 # pylint:disable=W0511
 # TODO: Отрефакторить строки с текстами сообщений
 

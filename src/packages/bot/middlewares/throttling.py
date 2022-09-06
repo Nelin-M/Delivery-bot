@@ -40,7 +40,8 @@ class ThrottlingMiddleware(BaseMiddleware):
             await self.message_throttled(message, t)
             raise CancelHandler()
 
-    async def message_throttled(self, message: types.Message, throttled: Throttled):
+    @staticmethod
+    async def message_throttled(message: types.Message, throttled: Throttled):
         """
         message_throttled
         """

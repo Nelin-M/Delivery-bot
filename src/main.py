@@ -4,17 +4,14 @@ This file is the main one, the bot is launched from it.
 from aiogram import executor
 
 from src.packages.database import database, setup_database
-from src.packages.bot.chat_bot import Bot
 from src.packages.bot.handlers import dispatcher
 from src.packages.bot.other.bot_hints import bot_hints
 from src.packages.bot.other.inform_admins import inform_admins
-from src.packages.logger.logger import Log, Loggers
+from src.packages.logger import logger, Loggers
 from src.packages.bot.middlewares import setup_middleware
 from src.packages.bot.filters import setup_filters
 
-logger = Log()
 logger.info(Loggers.APP.value, "Bot session started;")
-chat_bot = Bot(logger)
 
 
 async def connecting_file(load_dispatcher):

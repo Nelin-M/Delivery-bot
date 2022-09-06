@@ -1,8 +1,9 @@
 """
-Initialization file for the packages database, shemas.
+Initialization file for the packages database, schemas.
 """
 from .database import *
 
+__all__ = ["database", "setup_database"]
 
 database = Database()
 
@@ -11,6 +12,3 @@ database = Database()
 async def setup_database(db: database):
     await db.connect_db()
     await db.create_tables()
-
-
-__all__ = ["database", "setup_database"]

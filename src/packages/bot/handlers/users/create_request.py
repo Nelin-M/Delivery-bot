@@ -10,7 +10,7 @@ import emoji
 import aiogram.utils.markdown as md
 from src.packages.bot.loader import dispatcher, bot
 from src.packages.loaders import env_variables
-from src.packages.database.database import Database
+from src.packages.database import database
 from src.packages.bot.keyboards.buttons.choice_time import time_keyboard
 from src.packages.bot.keyboards.buttons.choice_date import date_keyboard
 from src.packages.bot.keyboards.buttons.destination_place import default_keyboard
@@ -22,11 +22,6 @@ from src.packages.bot.keyboards.buttons.confirmation_ride_request import keyboar
 from src.packages.bot.states.create_request import RideRequest
 
 channel_id = env_variables.get("CHANNEL_ID")
-host = env_variables.get("HOST")
-user = env_variables.get("USER")
-password = env_variables.get("PASSWORD")
-db_name = env_variables.get("DB_NAME")
-Database = Database(host, user, password, db_name)
 
 
 ####################################################################
@@ -42,7 +37,7 @@ def refactor_str(str_input):
 def handler_date(str_date):
     """
     This function refactor str in date
-    @param str_input: str_date
+    @param str_date: str_date
     """
     lst_date = str_date.split(".")
     day = int(lst_date[0])
@@ -54,7 +49,7 @@ def handler_date(str_date):
 def handler_time(str_time):
     """
     This function refactor str in time
-    @param str_input: str_time
+    @param str_time: str_time
     """
     lst_time = str_time.split(":")
     hour = int(lst_time[0])
@@ -78,7 +73,7 @@ async def choice_date(message: types.Message):
     This function transition to the state create ride request and choice ride data
     @param message: Message object
     """
-    await Database.connect_db()
+    await database.connect_db()
     await RideRequest.date.set()
     await message.answer("Выерите дату " + emoji.emojize(":calendar:"), reply_markup=date_keyboard)
 
@@ -196,20 +191,20 @@ async def process_driver(message: types.Message, state: FSMContext):
     """
     if message.text == "Отправить":
         async with state.proxy() as data:
-            user_from_db = await Database.select_user_by_tg_id(message.from_user.id)
+            user_from_db = await database.select_user_by_tg_id(message.from_user.id)
             data["author"] = user_from_db.id
         data = await state.get_data()
-        await Database.add_ride_request(**data)
-        car = await Database.select_car_by_id(user.car_id)
+        await database.add_ride_request(**data)
+        car = await database.select_car_by_id(user_from_db.car_id)
         await state.finish()
         await bot.send_message(
             message.chat.id,
             md.text(
                 md.text(f'{md.code("Заявка создана")}'),
-                md.text(f'{md.bold("Водитель: ")}{user.first_name} {user.last_name} '),
+                md.text(f'{md.bold("Водитель: ")}{user_from_db.first_name} {user_from_db.last_name} '),
                 md.text(
                     f'{md.bold("Номер телефона: ")}'
-                    f'{user.phone_number if user.phone_number is not None else "не указан"}'
+                    f'{user_from_db.phone_number if user_from_db.phone_number is not None else "не указан"}'
                 ),
                 md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
                 md.text(
@@ -233,14 +228,14 @@ async def process_driver(message: types.Message, state: FSMContext):
             channel_id,
             md.text(
                 md.text(f'{md.code("Заявка создана")}'),
-                md.text(f'{md.bold("Водитель: ")}{user.first_name} {user.last_name} '),
+                md.text(f'{md.bold("Водитель: ")}{user_from_db.first_name} {user_from_db.last_name} '),
                 md.text(
                     f'{md.bold("Номер телефона: ")}'
-                    f'{user.phone_number if user.phone_number is not None else "не указан"}'
+                    f'{user_from_db.phone_number if user_from_db.phone_number is not None else "не указан"}'
                 ),
                 md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
                 md.text(
-                    f'{md.bold("Когда и восколько: ")}{refactor_str(data["date_ride"].day)}.'
+                    f'{md.bold("Когда и во сколько: ")}{refactor_str(data["date_ride"].day)}.'
                     f'{refactor_str(data["date_ride"].month)}.{data["date_ride"].year} в '
                     f'{refactor_str(data["time_ride"].hour)}:{refactor_str(data["time_ride"].minute)}'
                 ),
