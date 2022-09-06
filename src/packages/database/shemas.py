@@ -10,6 +10,10 @@ db = Gino()
 
 # pylint: disable=C0115
 class BaseModel(db.Model):
+    """
+    The class of Base Model
+    """
+
     __abstract__ = True
 
 
@@ -54,7 +58,7 @@ class User(BaseModel):
 
 class RideRequest(db.Model):
     """
-    The class to create requests table
+    The class to create ride requests table
     """
 
     __tablename__ = "ride_requests"
