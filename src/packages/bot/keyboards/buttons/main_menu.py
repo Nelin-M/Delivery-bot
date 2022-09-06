@@ -4,12 +4,17 @@ Keyboard for the main menu
 
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-keyboards_main_menu = ReplyKeyboardMarkup(
+
+main_menu_authorised = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Создать/редактировать профиль для водителя")],
-        [KeyboardButton(text="Создать заявку"), KeyboardButton(text="Мои заявки")],
-        [KeyboardButton(text="Отзывы"), KeyboardButton(text="Отмена")],
+        [KeyboardButton("Создать заявку"), KeyboardButton("Мои заявки"), KeyboardButton("Мой профиль")],
+        [KeyboardButton("Назад")],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
+)
+
+
+main_menu_unauthorised = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton("Создать профиль")]], resize_keyboard=True, one_time_keyboard=True
 )
