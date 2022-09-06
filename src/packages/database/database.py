@@ -6,6 +6,7 @@ from datetime import date, time
 from asyncpg import UniqueViolationError
 from src.packages.database.shemas import User, RideRequest, Car, TgProfile, db
 from src.packages.logger import Loggers, Log
+from src.packages.loaders import env_variables
 
 __all__ = ["Database"]
 
@@ -16,20 +17,25 @@ class DatabaseException(Exception):
     """
 
 
+# pylint:disable=R0904
 class Database:
     """
     Database class.The class contains the necessary
     methods for working with the postgres sql database.
     """
 
-    def __init__(self, host, user, password, db_name):
-        self.host = host
-        self.user = user
-        self.password = password
-        self.db_name = db_name
-        self.__connect_db()
+    def __init__(self):
+        self.host = env_variables.get("DATABASE_HOST")
+        self.user = env_variables.get("DATABASE_NAME")
+        self.password = env_variables.get("DATABASE_USER")
+        self.db_name = env_variables.get("DATABASE_PASSWORD")
+        # self.__connect_db()
+        # self.__create_tables()
 
-    async def __connect_db(self):
+    async def connect_db(self):
+        """
+        Makes connection with a database
+        """
         try:
             await db.set_bind(f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}/{self.db_name}")
         # pylint: disable=W0703:
@@ -42,8 +48,8 @@ class Database:
         await db.gino.drop_all()
 
     @staticmethod
-    # pylint: disable=W0238:
-    async def __create_tables():
+    # pylint: disable=C0116,W0238:
+    async def create_tables():
         await db.gino.create_all()
 
     @staticmethod
@@ -105,6 +111,7 @@ class Database:
         car = await Car.query.where(Car.id == car_id).gino.first()
         return car
 
+    # pylint:disable=R0913
     @staticmethod
     async def add_ride_request(
         author: int,
