@@ -90,6 +90,17 @@ To enable pre-commit on the current repository:
 - `poetry run pylint src/*` – launch linter.
 - `poetry run python -m src.main` – launch app.
 
+### Docker
+
+Starting all containers:
+
+`docker compose run`
+
+Postgres database deployed with options specified in `.env` on port `5432`.
+
+Database management systems adminer deployed on port `8080` and is available at [this link](http://localhost:8080/).
+
+In order to enter the database, you need to specify parameters similar to the parameters from `.env`, in the _"Server"_ field you need to specify `postgres:5432`.
 
 ## Authors
 
