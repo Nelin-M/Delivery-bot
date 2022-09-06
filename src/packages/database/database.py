@@ -25,11 +25,11 @@ class Database:
     """
 
     def __init__(self):
+        self.user = env_variables.get("POSTGRES_USER")
+        self.password = env_variables.get("POSTGRES_PASSWORD")
         self.host = env_variables.get("POSTGRES_HOST")
-        self.user = env_variables.get("POSTGRES_DB")
-        self.password = env_variables.get("POSTGRES_USER")
-        self.db_name = env_variables.get("POSTGRES_PASSWORD")
-        self.port = env_variables.get("POSTGRES_PORT", default=5432)
+        self.port = env_variables.get("POSTGRES_PORT", 5432)
+        self.db_name = env_variables.get("POSTGRES_DB")
 
     async def connect_db(self):
         """
@@ -42,6 +42,7 @@ class Database:
         # pylint: disable=W0703:
         except Exception as exception:
             logger.critical(Loggers.APP.value, f"Unexpected error: {exception}")
+            raise exception
 
     @staticmethod
     # pylint: disable=W0238:

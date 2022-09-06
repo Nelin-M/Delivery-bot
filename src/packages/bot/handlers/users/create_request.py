@@ -17,7 +17,7 @@ from src.packages.bot.keyboards.buttons.destination_place import default_keyboar
 from src.packages.bot.keyboards.buttons.departure_place import keyboard_place_departure
 from src.packages.bot.keyboards.buttons.delivery_terms import keyboard_terms_delivery
 from src.packages.bot.keyboards.buttons.seats_number import number_of_seats_keyboard
-from src.packages.bot.keyboards.buttons.main_menu import keyboards_main_menu
+from src.packages.bot.keyboards.buttons.main_menu import main_menu_authorised
 from src.packages.bot.keyboards.buttons.confirmation_ride_request import keyboard_ok
 from src.packages.bot.states.create_request import RideRequest
 
@@ -64,7 +64,7 @@ async def menu_handler(message: types.Message):
     This function return to the main menu
     @param message: Message object
     """
-    await message.answer("Вы в главном меню:", reply_markup=keyboards_main_menu)
+    await message.answer("Вы в главном меню:", reply_markup=main_menu_authorised)
 
 
 @dispatcher.message_handler(Text(equals=["Создать заявку"], ignore_case=True))
@@ -221,7 +221,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                 md.text(f'{md.bold("Количество мест: ")}{data["seats_number"]}'),
                 sep="\n",
             ),
-            reply_markup=keyboards_main_menu,
+            reply_markup=main_menu_authorised,
             parse_mode=ParseMode.MARKDOWN,
         )
         await bot.send_message(
@@ -252,4 +252,4 @@ async def process_driver(message: types.Message, state: FSMContext):
         )
     else:
         await state.finish()
-        await message.answer("Вы в главном меню:", reply_markup=keyboards_main_menu)
+        await message.answer("Вы в главном меню:", reply_markup=main_menu_authorised)
