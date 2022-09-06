@@ -1,12 +1,11 @@
 """
-Initializing the dispatcher from modules
+Initializing dispatcher on users commands
 """
 # pylint: disable-all
 
-from .commands_for_admins import dispatcher
-from .commands_for_users import dispatcher
-from .cancel import dispatcher
-from .errors import dispatcher
+from .enter_menu import dispatcher
+from .main_menu import dispatcher
+from .profile import dispatcher
 
 
 __all__ = ["dispatcher"]
