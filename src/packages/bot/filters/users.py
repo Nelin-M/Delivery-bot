@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters import BoundFilter
 
 from src.packages.bot.loader import bot
 from src.packages.loaders import env_variables
-from src.packages.database import database
+from src.packages.database import UserTable
 
 
 class ChatWithABot(BoundFilter):
@@ -44,11 +44,11 @@ class AuthorisedUser(BoundFilter):
     """
 
     # pylint:disable=R0201,W0221,W0511
-    async def check(self, message: types.Message):  # TODO: Проверка осуществляется двумя запросами к БД, упростить
+    async def check(self, message: types.Message):
         """
         Overwritten checker
         @param message:
         @return:
         """
-        user = await database.select_user_by_tg_id(message.from_user.id)
+        user = await UserTable.get(message.from_user.id, id_type="telegram")
         return bool(user)

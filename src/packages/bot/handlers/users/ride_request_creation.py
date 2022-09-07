@@ -10,7 +10,7 @@ import emoji
 import aiogram.utils.markdown as md
 from src.packages.bot.loader import dispatcher, bot
 from src.packages.loaders import env_variables
-from src.packages.database import database
+from src.packages.database import UserTable, RideRequestTable, CarTable
 from src.packages.bot.keyboards import buttons
 from src.packages.bot.states import CreateRideRequest
 from src.packages.bot.filters import GroupMember, ChatWithABot, AuthorisedUser
@@ -59,7 +59,6 @@ async def choice_date(message: types.Message):
     This function transition to the state create ride request and choice ride data
     @param message: Message object
     """
-    await database.connect_db()
     await CreateRideRequest.date.set()
     await message.answer("Выерите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.date_keyboard)
 
@@ -183,11 +182,11 @@ async def process_driver(message: types.Message, state: FSMContext):
     """
     if message.text == "Отправить":
         async with state.proxy() as data:
-            user_from_db = await database.select_user_by_tg_id(message.from_user.id)
+            user_from_db = await UserTable.get(message.from_user.id, id_type="telegram")
             data["author"] = user_from_db.id
         data = await state.get_data()
-        await database.add_ride_request(**data)
-        car = await database.select_car_by_id(user_from_db.car_id)
+        await RideRequestTable.add(**data)
+        car = await CarTable.get(user_from_db.car_id)
         await state.finish()
         await bot.send_message(
             message.chat.id,
