@@ -94,7 +94,7 @@ To enable pre-commit on the current repository:
 
 Starting all containers:
 
-`docker compose run`
+`docker-compose up`
 
 Postgres database deployed with options specified in `.env` on port `5432`.
 
