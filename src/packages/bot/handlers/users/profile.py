@@ -8,7 +8,7 @@ from src.packages.bot.states import EditProfileFSM, DeleteProfileFSM
 from src.packages.bot.filters import GroupMember, ChatWithABot, AuthorisedUser
 from src.packages.bot.loader import dispatcher
 from src.packages.bot.keyboards import buttons
-from src.packages.database import database
+from src.packages.database import UserTable, TelegramProfileTable
 
 
 # pylint:disable=W0511
@@ -93,8 +93,8 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
             if nickname is None:
                 nickname = str(message.from_user.id)
 
-            await database.add_tg_profile(tg_id=message.from_user.id, nickname=nickname)
-            await database.add_user(
+            await TelegramProfileTable.add(tg_id=message.from_user.id, nickname=nickname)
+            await UserTable.add(
                 tg_id=message.from_user.id,
                 first_name=data.get("first_name"),
                 last_name=data.get("last_name"),
@@ -124,7 +124,7 @@ async def profile(message: types.Message):
     This function shows user info
     @param message: Message object
     """
-    user = await database.select_user_by_tg_id(message.from_user.id)
+    user = await UserTable.get(message.from_user.id, id_type="telegram")
     await message.answer(
         text=f"""Ваш профиль:
 {user.first_name} {user.last_name}
@@ -164,7 +164,9 @@ async def delete_result_handling(message: types.Message, state: FSMContext):
     """
     # pylint:disable=W0511
     if message.text == "Да":  # TODO: Нужен запрос к БД на удаление записей
+        await UserTable.delete(message.from_user.id, id_type="telegram")
         await state.finish()
+        await message.answer(text="Ваш профиль удалён, возвращайтесь поскорее!")
     elif message.text == "Отменить":
         await state.finish()
     else:
