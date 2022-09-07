@@ -3,7 +3,7 @@ This module handles users commands
 """
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from asyncpg import UniqueViolationError
+from src.packages.database import DatabaseException
 from src.packages.bot.states import EditProfileFSM, DeleteProfileFSM
 from src.packages.bot.filters import GroupMember, ChatWithABot, AuthorisedUser
 from src.packages.bot.loader import dispatcher
@@ -102,7 +102,7 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
                 phone_number=data.get("phone_number"),
             )
             await message.answer(text="Профиль успешно создан!")
-        except UniqueViolationError as error:
+        except DatabaseException as error:
             await message.answer(text=str(error))
         finally:
             await state.finish()

@@ -8,7 +8,7 @@ from src.packages.database.shemas import User, RideRequest, Car, TgProfile, db
 from src.packages.logger import Loggers, logger
 from src.packages.loaders import env_variables
 
-__all__ = ["Database"]
+__all__ = ["Database", "DatabaseException"]
 
 
 class DatabaseException(Exception):

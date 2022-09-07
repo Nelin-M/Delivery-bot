@@ -3,7 +3,7 @@ Initialization file for the packages database, schemas.
 """
 from .database import *
 
-__all__ = ["database", "setup_database"]
+__all__ = ["database", "setup_database", "DatabaseException"]
 
 database = Database()
 
