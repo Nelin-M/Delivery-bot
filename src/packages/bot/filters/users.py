@@ -51,4 +51,4 @@ class AuthorisedUser(BoundFilter):
         @return:
         """
         user = await database.select_user_by_tg_id(message.from_user.id)
-        return await database.check_user_in_database(user.id)
+        return bool(user)
