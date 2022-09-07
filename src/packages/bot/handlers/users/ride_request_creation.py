@@ -12,7 +12,7 @@ from src.packages.bot.loader import dispatcher, bot
 from src.packages.loaders import env_variables
 from src.packages.database import database
 from src.packages.bot.keyboards import buttons
-from src.packages.bot.states.ride_request_creation import CreateRideRequest
+from src.packages.bot.states import CreateRideRequest
 from src.packages.bot.filters import GroupMember, ChatWithABot, AuthorisedUser
 
 channel_id = env_variables.get("GROUP_ID")
