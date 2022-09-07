@@ -4,7 +4,7 @@ This module for creating state ride request
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-class RideRequest(StatesGroup):
+class CreateRideRequest(StatesGroup):
     """
     This class for creating state ride request
     """
