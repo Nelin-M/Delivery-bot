@@ -51,7 +51,10 @@ class Database:
 
     @staticmethod
     # pylint: disable=W0238:
-    async def __create_tables():
+    async def create_tables():
+        """
+        Create table
+        """
         await db.gino.create_all()
 
     @staticmethod
