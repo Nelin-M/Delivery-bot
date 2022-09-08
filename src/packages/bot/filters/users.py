@@ -50,5 +50,5 @@ class AuthorisedUser(BoundFilter):
         @param message:
         @return:
         """
-        user = await UserTable.get(message.from_user.id, id_type="telegram")
+        user = await UserTable.get_by_telegram_id(message.from_user.id)
         return bool(user)

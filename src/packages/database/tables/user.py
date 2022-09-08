@@ -32,19 +32,28 @@ class UserTable:
 
     # pylint: disable=W0622,C0103:
     @staticmethod
-    async def get(id: int, id_type="table") -> User:
+    async def get_by_user_id(user_id: int) -> User:
         """
         This method returns User object
-        @param id: table row id or user's telegram id
-        @param id_type: optional("table", "telegram")
+        @param user_id: User.id
         @return: User
         """
-        user = None
         # try:
-        if id_type == "table":
-            user = await User.query.where(User.id == id).gino.first()
-        elif id_type == "telegram":
-            user = await User.query.where(User.tg_id == id).gino.first()
+        user = await User.query.where(User.id == user_id).gino.first()
+        # except:
+        #     pass
+
+        return user
+
+    @staticmethod
+    async def get_by_telegram_id(tg_id: int) -> User:
+        """
+        This method returns User object
+        @param tg_id: telegram id
+        @return: User
+        """
+        # try:
+        user = await User.query.where(User.tg_id == tg_id).gino.first()
         # except:
         #     pass
 
@@ -52,31 +61,29 @@ class UserTable:
 
     # pylint: disable=W0622,C0103:
     @classmethod
-    async def update(cls, id: int, id_type="table", **data):
+    async def update(cls, user_id: int, **data):
         """
         This method updates User object
-        @param id: table row id or user's telegram id
-        @param id_type: optional("table", "telegram")
+        @param user_id: User.id
         @param data: data to update
         @return:
         """
         # try:
-        user = await cls.get(id, id_type)
+        user = await cls.get_by_user_id(user_id)
         await user.update(**data).apply()
         # except:
         #     pass
 
     # pylint: disable=W0622,C0103:
     @classmethod
-    async def delete(cls, id: int, id_type="table"):
+    async def delete(cls, user_id: int):
         """
         This method deletes User object
-        @param id: table row id or user's telegram id
-        @param id_type: optional("table", "telegram")
+        @param user_id: User.id
         @return:
         """
         # try:
-        user = await cls.get(id, id_type)
+        user = await cls.get_by_user_id(user_id)
         await user.delete()
         # except:
         #     pass

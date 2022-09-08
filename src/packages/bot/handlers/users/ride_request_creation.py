@@ -182,7 +182,7 @@ async def process_driver(message: types.Message, state: FSMContext):
     """
     if message.text == "Отправить":
         async with state.proxy() as data:
-            user_from_db = await UserTable.get(message.from_user.id, id_type="telegram")
+            user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
             data["author"] = user_from_db.id
         data = await state.get_data()
         await RideRequestTable.add(**data)

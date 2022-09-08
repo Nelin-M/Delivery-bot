@@ -124,7 +124,7 @@ async def profile(message: types.Message):
     This function shows user info
     @param message: Message object
     """
-    user = await UserTable.get(message.from_user.id, id_type="telegram")
+    user = await UserTable.get_by_telegram_id(message.from_user.id)
     await message.answer(
         text=f"""Ваш профиль:
 {user.first_name} {user.last_name}
@@ -164,7 +164,8 @@ async def delete_result_handling(message: types.Message, state: FSMContext):
     """
     # pylint:disable=W0511
     if message.text == "Да":  # TODO: Нужен запрос к БД на удаление записей
-        await UserTable.delete(message.from_user.id, id_type="telegram")
+        user = await UserTable.get_by_telegram_id(message.from_user.id)
+        await UserTable.delete(user.id)
         await state.finish()
         await message.answer(text="Ваш профиль удалён, возвращайтесь поскорее!")
     elif message.text == "Отменить":
