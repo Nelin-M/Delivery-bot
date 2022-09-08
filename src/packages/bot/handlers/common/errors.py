@@ -13,7 +13,7 @@ async def not_signed(message: types.Message):
     """
     The function gives a button with a link to the group if the bot user is not subscribed to it
     """
-    await message.answer(f"{message.from_user.first_name} ты не подписан на группу", reply_markup=subscribe)
+    await message.answer(f"{message.from_user.first_name}, ты не подписан на группу", reply_markup=subscribe)
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember())
