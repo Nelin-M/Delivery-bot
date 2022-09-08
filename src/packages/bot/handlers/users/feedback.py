@@ -29,7 +29,7 @@ async def write_review(call: types.CallbackQuery):
     """
     group_parameters = await call.bot.get_chat(env_variables.get("CHANNEL_FEEDBACK_ID"))
     await call.message.answer(
-        f"Ваш отзыв будет опубликован в группе [{group_parameters.title}]({group_parameters.invite_link}),"
+        f"Ваш отзыв будет опубликован в группе [{group_parameters.title}]({group_parameters.invite_link}), "
         "ждем предложений и пожеланий:",
         parse_mode=types.ParseMode.MARKDOWN,
     )
