@@ -21,7 +21,7 @@ class ChatWithABot(BoundFilter):
         Checks the chat type
         """
 
-        return isinstance(message.chat.type, types.ChatType.PRIVATE)
+        return message.chat.type == types.ChatType.PRIVATE
 
 
 class ChatWithABotCallback(BoundFilter):
@@ -35,7 +35,7 @@ class ChatWithABotCallback(BoundFilter):
         Checks the chat type
         """
 
-        return isinstance(call.message.chat.type, types.ChatType.PRIVATE)
+        return call.message.chat.type == types.ChatType.PRIVATE
 
 
 class GroupMember(BoundFilter):
