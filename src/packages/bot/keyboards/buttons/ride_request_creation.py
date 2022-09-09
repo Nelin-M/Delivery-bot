@@ -70,10 +70,13 @@ time_keyboard = ReplyKeyboardMarkup(
 )
 
 keyboard_ok = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Отправить")], [KeyboardButton("Отменить заявку")]],
+    keyboard=[[KeyboardButton("Отправить"), KeyboardButton("Редактировать")], [KeyboardButton("Отменить заявку")]],
     resize_keyboard=True,
 )
-
+keyboard_main_profile = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton("Мой профиль")]],
+    resize_keyboard=True,
+)
 keyboard_terms_delivery = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton("Дальше")],

@@ -12,14 +12,15 @@ class TelegramProfileTable:
     """
 
     @staticmethod
-    async def add(tg_id: int, nickname: str):
+    async def add(tg_id: int, user_id: int, nickname: str):
         """
         The method adding a record to  table tg_profiles
         @param tg_id: id from telegram
+        @param user_id: id from tables users
         @param nickname: nickname from telegram
         """
         try:
-            tg_profile = TgProfile(tg_id=tg_id, nickname=nickname)
+            tg_profile = TgProfile(tg_id=tg_id, user_id=user_id, nickname=nickname)
             await tg_profile.create()
         except UniqueViolationError as exception:
             raise DatabaseException("Профиль телеграмма уже существует в базе данных.") from exception

@@ -13,7 +13,7 @@ from src.packages.loaders import env_variables
 from src.packages.database import UserTable, RideRequestTable, CarTable
 from src.packages.bot.keyboards import buttons
 from src.packages.bot.states import CreateRideRequest
-from src.packages.bot.filters import GroupMember, ChatWithABot, AuthorisedUser
+from src.packages.bot.filters import GroupMember, ChatWithABot, AuthorisedUser, HasCar
 
 channel_id = env_variables.get("CHANNEL_ID")
 
@@ -51,8 +51,22 @@ def handler_time(str_time):
     return time(hour, minute, second)
 
 
+@dispatcher.message_handler(state="*", commands="Отмена")
+@dispatcher.message_handler(Text(equals="отмена", ignore_case=True), state="*")
+async def cancel_handler(message: types.Message, state: FSMContext):
+    """
+    This function to exit to the main menu
+    @param message: Message object
+    """
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+    await state.finish()
+    await message.answer("Вы в главном меню", reply_markup=buttons.main_menu_authorised)
+
+
 @dispatcher.message_handler(
-    ChatWithABot(), GroupMember(), AuthorisedUser(), Text(equals=["Создать заявку"], ignore_case=True)
+    ChatWithABot(), GroupMember(), AuthorisedUser(), HasCar(), Text(equals=["Создать заявку"], ignore_case=True)
 )
 async def choice_date(message: types.Message):
     """
@@ -61,6 +75,20 @@ async def choice_date(message: types.Message):
     """
     await CreateRideRequest.date.set()
     await message.answer("Выерите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.date_keyboard)
+
+
+@dispatcher.message_handler(
+    ChatWithABot(), GroupMember(), AuthorisedUser(), ~HasCar(), Text(equals=["Создать заявку"], ignore_case=True)
+)
+async def not_car(message: types.Message):
+    """
+    This function shows message use without car
+    @param message: Message object
+    """
+    await message.answer(
+        "Для создания заявки необходимо добавить машину в разделе 'Мой профиль'\n" "Нажмите на кнопку ниже",
+        reply_markup=buttons.keyboard_main_profile,
+    )
 
 
 @dispatcher.message_handler(state=CreateRideRequest.date)
@@ -142,6 +170,8 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
     """
     async with state.proxy() as data:
         data["seats_number"] = int(message.text)
+        user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
+        car = await CarTable.get_by_user_id(user_from_db.id)
     await CreateRideRequest.next()
     await message.answer(
         "Подтвердите создание заявки  " + emoji.emojize(":check_mark_button:"), reply_markup=buttons.keyboard_ok
@@ -149,6 +179,14 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
     await bot.send_message(
         message.chat.id,
         md.text(
+            md.text(
+                f'{md.bold("Водитель: ")}{user_from_db.first_name} {user_from_db.last_name if user_from_db.last_name is not None else ""} '  # pylint: disable=line-too-long
+            ),
+            md.text(
+                f'{md.bold("Номер телефона: ")}'
+                f'{user_from_db.phone_number if user_from_db.phone_number is not None else "не указан"}'
+            ),
+            md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
             md.text(
                 f'{md.bold("Когда и восколько: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'  # pylint: disable=line-too-long
                 f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.{data["date_ride"].year if data.get("date_ride") is not None else ""} в '  # pylint: disable=line-too-long
@@ -165,7 +203,7 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
                 f'{md.bold("Место прибытия: ")}{data["destination_place"] if data.get("destination_place") is not None else ""}'  # pylint: disable=line-too-long
             ),
             md.text(
-                f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
+                f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'  # pylint: disable=line-too-long
             ),
             sep="\n",
         ),
@@ -183,10 +221,11 @@ async def process_driver(message: types.Message, state: FSMContext):
     if message.text == "Отправить":
         async with state.proxy() as data:
             user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
+            print(user_from_db.id)
             data["author"] = user_from_db.id
         data = await state.get_data()
         await RideRequestTable.add(**data)
-        car = await CarTable.get(user_from_db.car_id)
+        car = await CarTable.get_by_user_id(user_from_db.id)
         await state.finish()
         await bot.send_message(
             message.chat.id,
@@ -227,6 +266,7 @@ async def process_driver(message: types.Message, state: FSMContext):
             reply_markup=buttons.main_menu_authorised,
             parse_mode=ParseMode.MARKDOWN,
         )
+        await bot.send_message(message.chat.id, "Данную заявку вы сможете найти в нижнем меню -> «Мои заявки»")
         await bot.send_message(
             channel_id,
             md.text(
@@ -261,6 +301,10 @@ async def process_driver(message: types.Message, state: FSMContext):
             ),
             parse_mode=ParseMode.MARKDOWN,
         )
+    elif message.text == "Редактировать":
+        await state.reset_state()
+        await CreateRideRequest.date.set()
+        await message.answer("Выерите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.date_keyboard)
     else:
         await state.finish()
         await message.answer("Вы в главном меню:", reply_markup=buttons.main_menu_authorised)
