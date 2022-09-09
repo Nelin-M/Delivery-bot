@@ -24,6 +24,20 @@ class ChatWithABot(BoundFilter):
         return message.chat.type == types.ChatType.PRIVATE
 
 
+class ChatWithABotCallback(BoundFilter):
+    """
+    The filter allows you to carry out only personal correspondence with the bot
+    """
+
+    # pylint:disable=R0201,W0221
+    async def check(self, call: types.CallbackQuery):
+        """
+        Checks the chat type
+        """
+
+        return call.message.chat.type == types.ChatType.PRIVATE
+
+
 class GroupMember(BoundFilter):
     """
     Checks whether the user is in a group
@@ -34,7 +48,23 @@ class GroupMember(BoundFilter):
         """
         Checks the status of the user in the group
         """
-        chat_member = await bot.get_chat_member(chat_id=env_variables.get("GROUP_ID"), user_id=message.from_user.id)
+        chat_member = await bot.get_chat_member(chat_id=env_variables.get("CHANNEL_ID"), user_id=message.from_user.id)
+        return chat_member.is_chat_member()
+
+
+class GroupMemberCallback(BoundFilter):
+    """
+    Checks whether the user is in a group
+    """
+
+    # pylint:disable=R0201,W0221
+    async def check(self, call: types.CallbackQuery):
+        """
+        Checks the status of the user in the group
+        """
+        chat_member = await bot.get_chat_member(
+            chat_id=env_variables.get("CHANNEL_ID"), user_id=call.message.from_user.id
+        )
         return chat_member.is_chat_member()
 
 
@@ -44,7 +74,7 @@ class AuthorisedUser(BoundFilter):
     """
 
     # pylint:disable=R0201,W0221,W0511
-    async def check(self, message: types.Message):
+    async def check(self, message: types.Message):  # TODO: Проверка осуществляется двумя запросами к БД, упростить
         """
         Overwritten checker
         @param message:

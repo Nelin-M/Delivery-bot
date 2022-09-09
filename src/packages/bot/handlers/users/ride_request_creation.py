@@ -15,7 +15,7 @@ from src.packages.bot.keyboards import buttons
 from src.packages.bot.states import CreateRideRequest
 from src.packages.bot.filters import GroupMember, ChatWithABot, AuthorisedUser
 
-channel_id = env_variables.get("GROUP_ID")
+channel_id = env_variables.get("CHANNEL_ID")
 
 
 def refactor_str(str_input):
