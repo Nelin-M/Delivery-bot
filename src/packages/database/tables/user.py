@@ -12,7 +12,7 @@ class UserTable:
     """
 
     @staticmethod
-    async def add(tg_id: int, first_name: str, last_name: str, car_id: int, phone_number: str):
+    async def add(tg_id: int, first_name: str, last_name: str, car_id: int or None, phone_number: str):
         """
         The method to add a record to a table users
         @param tg_id: id from telegram

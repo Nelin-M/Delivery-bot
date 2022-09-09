@@ -39,7 +39,7 @@ class TelegramProfileTable:
         """
         The method change  nickname from tg_profile
         @param tg_id: User ID from telegram
-        @param new_nickname: new nickname
+        @param data: data to update
         @return: true if success else false
         """
         tg_profile = await cls.get(tg_id)
