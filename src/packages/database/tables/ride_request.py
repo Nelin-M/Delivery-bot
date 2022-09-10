@@ -24,6 +24,7 @@ class RideRequestTable:
         departure_place: str,
         destination_place: str,
         seats_number: int,
+        post_message_id: int,
     ) -> int:
         """
         The method adding a record to  table ride_requests
@@ -34,6 +35,7 @@ class RideRequestTable:
         @param departure_place:departure_place
         @param destination_place:destination_place
         @param seats_number: number of seats places
+        @param post_message_id: post id in the channel with ride requests in the telegram
         @return: id of the ride request added to the table
         """
         try:
@@ -45,6 +47,7 @@ class RideRequestTable:
                 departure_place=departure_place,
                 destination_place=destination_place,
                 seats_number=seats_number,
+                post_message_id=post_message_id,
             )
             await new_request.create()
             return new_request.id
@@ -62,7 +65,7 @@ class RideRequestTable:
         return ride_request
 
     @staticmethod
-    async def get_user_ride_requests(user_id) -> List[RideRequest]:
+    async def get_user_ride_requests(user_id: int) -> List[RideRequest]:
         """
         This method returns list of user ride requests
         @param user_id: User ID

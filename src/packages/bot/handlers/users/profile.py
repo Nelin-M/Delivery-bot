@@ -141,10 +141,6 @@ async def update_profile(message: types.Message):  # TODO: Нужен запро
     @param message: Message object
     """
     # pylint:disable=W0511
-    user = await UserTable.get_by_telegram_id(message.from_user.id)
-    # для примера
-    data = {"first_name": "Dasha", "last_name": "Shati"}
-    await UserTable.update(user.id, data)
     await message.answer(text="Привет")  # TODO: Также подумать над реализацией изменения информации
 
 

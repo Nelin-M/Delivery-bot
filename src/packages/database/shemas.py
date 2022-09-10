@@ -75,4 +75,5 @@ class RideRequest(db.Model):
     departure_place = Column(String, nullable=False)
     destination_place = Column(String, nullable=False)
     seats_number = Column(Integer, nullable=False)
+    post_message_id = Column(Integer, nullable=False)
     query: sql.select
