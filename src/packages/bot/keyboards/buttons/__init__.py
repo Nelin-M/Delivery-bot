@@ -15,6 +15,7 @@ from .ride_request_creation import keyboard_place_departure
 from .ride_request_creation import keyboard_terms_delivery
 from .ride_request_creation import number_of_seats_keyboard
 from .ride_request_creation import keyboard_ok
+from .ride_request_creation import keyboard_main_profile
 
 
 __all__ = [
@@ -30,4 +31,5 @@ __all__ = [
     "number_of_seats_keyboard",
     "keyboard_terms_delivery",
     "keyboard_place_departure",
+    "keyboard_main_profile",
 ]

@@ -92,15 +92,14 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
             nickname = message.from_user.username
             if nickname is None:
                 nickname = str(message.from_user.id)
-
-            await TelegramProfileTable.add(tg_id=message.from_user.id, nickname=nickname)
-            await UserTable.add(
-                tg_id=message.from_user.id,
+            user = await UserTable.add(
+                id_from_tg=message.from_user.id,
                 first_name=data.get("first_name"),
                 last_name=data.get("last_name"),
-                car_id=None,
+                id_from_car=None,
                 phone_number=data.get("phone_number"),
             )
+            await TelegramProfileTable.add(tg_id=message.from_user.id, user_id=user.id, nickname=nickname)
             await message.answer(text="Профиль успешно создан!")
         except DatabaseException as error:
             await message.answer(text=str(error))

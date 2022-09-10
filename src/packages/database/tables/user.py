@@ -12,21 +12,26 @@ class UserTable:
     """
 
     @staticmethod
-    async def add(tg_id: int, first_name: str, last_name: str, car_id: int or None, phone_number: str):
+    async def add(id_from_tg: int, first_name: str, last_name: str, id_from_car: int or None, phone_number: str):
         """
         The method to add a record to a table users
-        @param tg_id: id from telegram
+        @param id_from_tg: id from telegram
         @param first_name: first_name from telegram
         @param last_name: last_name from telegram
-        @param car_id: car_id from cars table
+        @param id_from_car: car_id from cars table
         @param phone_number: phone number entered by the user
         @return: id of the user added to the table users
         """
         try:
             user = User(
-                tg_id=tg_id, first_name=first_name, last_name=last_name, car_id=car_id, phone_number=phone_number
+                id_from_tg=id_from_tg,
+                first_name=first_name,
+                last_name=last_name,
+                id_from_car=id_from_car,
+                phone_number=phone_number,
             )
             await user.create()
+            return user
         except UniqueViolationError as exception:
             raise DatabaseException("Пользователь уже существует в базе данных.") from exception
 
@@ -46,14 +51,14 @@ class UserTable:
         return user
 
     @staticmethod
-    async def get_by_telegram_id(tg_id: int) -> User:
+    async def get_by_telegram_id(id_from_tg: int) -> User:
         """
         This method returns User object
-        @param tg_id: telegram id
+        @param id_from_tg: telegram id
         @return: User
         """
         # try:
-        user = await User.query.where(User.tg_id == tg_id).gino.first()
+        user = await User.query.where(User.id_from_tg == id_from_tg).gino.first()
         # except:
         #     pass
 

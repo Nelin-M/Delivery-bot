@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters import BoundFilter
 
 from src.packages.bot.loader import bot
 from src.packages.loaders import env_variables
-from src.packages.database import UserTable
+from src.packages.database import UserTable, CarTable
 
 
 class ChatWithABot(BoundFilter):
@@ -82,3 +82,21 @@ class AuthorisedUser(BoundFilter):
         """
         user = await UserTable.get_by_telegram_id(message.from_user.id)
         return bool(user)
+
+
+class HasCar(BoundFilter):
+    """
+    Checks if user has car
+    """
+
+    # pylint:disable=R0201,W0221,W0511
+    async def check(self, message: types.Message):  # TODO: Проверка осуществляется двумя запросами к БД, упростить
+        """
+        Overwritten checker
+        @param message:
+        @return:
+        """
+
+        user = await UserTable.get_by_telegram_id(message.from_user.id)
+        car = await CarTable.get_by_user_id(user.id)
+        return bool(car)
