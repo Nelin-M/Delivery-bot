@@ -57,6 +57,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     """
     This function to exit to the main menu
     @param message: Message object
+    @param state: FSMContext object
     """
     current_state = await state.get_state()
     if current_state is None:
@@ -74,7 +75,7 @@ async def choice_date(message: types.Message):
     @param message: Message object
     """
     await CreateRideRequest.date.set()
-    await message.answer("Выерите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.date_keyboard)
+    await message.answer("Выберите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.date_keyboard)
 
 
 @dispatcher.message_handler(
@@ -188,7 +189,7 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
             ),
             md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
             md.text(
-                f'{md.bold("Когда и восколько: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'  # pylint: disable=line-too-long
+                f'{md.bold("Дата и время: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'  # pylint: disable=line-too-long
                 f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.{data["date_ride"].year if data.get("date_ride") is not None else ""} в '  # pylint: disable=line-too-long
                 f'{refactor_str(data["time_ride"].hour if data.get("time_ride") is not None else "")}:{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'  # pylint: disable=line-too-long
             ),
@@ -224,9 +225,9 @@ async def process_driver(message: types.Message, state: FSMContext):
             print(user_from_db.id)
             data["author"] = user_from_db.id
         data = await state.get_data()
-        await RideRequestTable.add(**data)
         car = await CarTable.get_by_user_id(user_from_db.id)
         await state.finish()
+        await bot.send_message(message.chat.id, "Данную заявку вы сможете найти в нижнем меню -> «Мои заявки»")
         await bot.send_message(
             message.chat.id,
             md.text(
@@ -241,7 +242,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                 ),
                 md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
                 md.text(
-                    f'{md.bold("Когда и восколько: ")}'
+                    f'{md.bold("Дата и время: ")}'
                     f'{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'
                     f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.'
                     f'{data["date_ride"].year if data.get("date_ride") is not None else ""} в '
@@ -266,8 +267,7 @@ async def process_driver(message: types.Message, state: FSMContext):
             reply_markup=buttons.main_menu_authorised,
             parse_mode=ParseMode.MARKDOWN,
         )
-        await bot.send_message(message.chat.id, "Данную заявку вы сможете найти в нижнем меню -> «Мои заявки»")
-        await bot.send_message(
+        post_in_channel = await bot.send_message(
             channel_id,
             md.text(
                 md.text(f'{md.code("Заявка создана")}'),
@@ -280,7 +280,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                 ),
                 md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
                 md.text(
-                    f'{md.bold("Когда и восколько: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'  # pylint: disable=line-too-long
+                    f'{md.bold("Дата и время: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'  # pylint: disable=line-too-long
                     f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.{data["date_ride"].year if data.get("date_ride") is not None else ""} в '  # pylint: disable=line-too-long
                     f'{refactor_str(data["time_ride"].hour if data.get("time_ride") is not None else "")}:{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'  # pylint: disable=line-too-long
                 ),
@@ -301,10 +301,12 @@ async def process_driver(message: types.Message, state: FSMContext):
             ),
             parse_mode=ParseMode.MARKDOWN,
         )
+        await RideRequestTable.add(post_message_id=post_in_channel.message_id, **data)
+
     elif message.text == "Редактировать":
         await state.reset_state()
         await CreateRideRequest.date.set()
-        await message.answer("Выерите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.date_keyboard)
+        await message.answer("Выберите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.date_keyboard)
     else:
         await state.finish()
         await message.answer("Вы в главном меню:", reply_markup=buttons.main_menu_authorised)
