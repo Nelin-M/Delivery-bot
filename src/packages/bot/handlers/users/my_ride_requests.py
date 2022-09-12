@@ -10,7 +10,7 @@ from src.packages.database import DatabaseException
 # from src.packages.loaders import env_variables
 from src.packages.bot.filters import GroupMember, ChatWithABot, AuthorisedUser
 from src.packages.bot.loader import dispatcher, bot
-from src.packages.database import database
+from src.packages.database import UserTable, RideRequestTable
 
 
 def refactor_str(str_input):
@@ -28,8 +28,8 @@ async def my_ride_requests_start(message: types.Message):
     @param message: Message object
     """
     try:
-        user = await database.select_user_by_tg_id(message.from_user.id)
-        all_ride_requests = await database.select_all_requests_user(user.id)
+        user = await UserTable.get_by_telegram_id(message.from_user.id)
+        all_ride_requests = await RideRequestTable.get_user_ride_requests(user.id)
         if all_ride_requests is None:
             bot.send_message(message.chat.id, "У вас нет созданных заявок.")
             return

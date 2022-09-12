@@ -24,7 +24,7 @@ class CarTable:
         try:
             car = Car(model=model, brand=brand, number_plate=number_plate, user_id=user_id)
             car = await car.create()
-            return car.id
+            return car.car_id
         except UniqueViolationError as exception:
             raise DatabaseException("Автомобиль уже существует в базе данных.") from exception
 
@@ -49,7 +49,7 @@ class CarTable:
         return car
 
     @classmethod
-    async def update(cls, car_id: int, **data):
+    async def update(cls, car_id: int, data: dict):
         """
         This method updates Car object
         @param car_id: Car.id

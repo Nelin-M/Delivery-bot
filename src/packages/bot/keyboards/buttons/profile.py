@@ -5,7 +5,10 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 
 profile_menu = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Редактировать профиль"), KeyboardButton("Удалить профиль")], [KeyboardButton("Назад")]],
+    keyboard=[
+        [KeyboardButton("Редактировать профиль"), KeyboardButton("Мой автомобиль")],
+        [KeyboardButton("Удалить профиль"), KeyboardButton("Назад")],
+    ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
