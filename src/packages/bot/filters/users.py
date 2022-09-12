@@ -74,7 +74,7 @@ class AuthorisedUser(BoundFilter):
     """
 
     # pylint:disable=R0201,W0221,W0511
-    async def check(self, message: types.Message):  # TODO: Проверка осуществляется двумя запросами к БД, упростить
+    async def check(self, message: types.Message):
         """
         Overwritten checker
         @param message:

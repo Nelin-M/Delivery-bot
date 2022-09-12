@@ -75,7 +75,7 @@ class RideRequestTable:
         return user_ride_requests
 
     @classmethod
-    async def update(cls, ride_request_id: int, **data):
+    async def update(cls, ride_request_id: int, data: dict):
         """
         This method updates RideRequest object
         @param ride_request_id:

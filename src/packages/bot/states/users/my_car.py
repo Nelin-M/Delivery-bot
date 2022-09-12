@@ -1,22 +1,22 @@
 """
-This module keeps user profile FSMs
+This module keeps car profile FSMs
 """
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
-class EditProfileFSM(StatesGroup):
+class EditCarFSM(StatesGroup):
     """
-    Finite state machine to lead user making him fill info about himself
+    Finite state machine to lead user making him fill info about his car
     """
 
-    first_name = State()
-    last_name = State()
-    phone_number = State()
+    brand = State()
+    model = State()
+    number_plate = State()
     confirmation = State()
     result_handling = State()
 
 
-class DeleteProfileFSM(StatesGroup):
+class DeleteCarFSM(StatesGroup):
     """
     Finite state machine to lead user making him confirm delete intention
     """

@@ -36,7 +36,7 @@ class TelegramProfileTable:
         return tg_profile
 
     @classmethod
-    async def update(cls, tg_id: int, **data):
+    async def update(cls, tg_id: int, data: dict):
         """
         The method change  nickname from tg_profile
         @param tg_id: User ID from telegram

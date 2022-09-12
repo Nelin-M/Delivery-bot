@@ -6,6 +6,7 @@ Initializing dispatcher on users commands
 from .enter_menu import dispatcher
 from .main_menu import dispatcher
 from .profile import dispatcher
+from .my_car import dispatcher
 from .ride_request_creation import dispatcher
 from .feedback import dispatcher
 from .my_ride_requests import dispatcher

@@ -66,7 +66,7 @@ class UserTable:
 
     # pylint: disable=W0622,C0103:
     @classmethod
-    async def update(cls, user_id: int, **data):
+    async def update(cls, user_id: int, data: dict):
         """
         This method updates User object
         @param user_id: User.id
