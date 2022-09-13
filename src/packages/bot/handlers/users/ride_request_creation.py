@@ -228,6 +228,7 @@ async def process_driver(message: types.Message, state: FSMContext):
         car = await CarTable.get_by_user_id(user_from_db.id)
         await state.finish()
         await bot.send_message(message.chat.id, "Данную заявку вы сможете найти в нижнем меню -> «Мои заявки»")
+        nickname = message.from_user.username
         await bot.send_message(
             message.chat.id,
             md.text(
@@ -269,37 +270,17 @@ async def process_driver(message: types.Message, state: FSMContext):
         )
         post_in_channel = await bot.send_message(
             channel_id,
-            md.text(
-                md.text(f'{md.code("Заявка создана")}'),
-                md.text(
-                    f'{md.bold("Водитель: ")}{user_from_db.first_name} {user_from_db.last_name if user_from_db.last_name is not None else ""} '  # pylint: disable=line-too-long
-                ),
-                md.text(
-                    f'{md.bold("Номер телефона: ")}'
-                    f'{user_from_db.phone_number if user_from_db.phone_number is not None else "не указан"}'
-                ),
-                md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
-                md.text(
-                    f'{md.bold("Дата и время: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'  # pylint: disable=line-too-long
-                    f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.{data["date_ride"].year if data.get("date_ride") is not None else ""} в '  # pylint: disable=line-too-long
-                    f'{refactor_str(data["time_ride"].hour if data.get("time_ride") is not None else "")}:{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'  # pylint: disable=line-too-long
-                ),
-                md.text(
-                    f"{md.bold('Условия довоза: ')}"
-                    f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
-                ),
-                md.text(
-                    f'{md.bold("Место отправления: ")}{data["departure_place"] if data.get("departure_place") is not None else ""}'  # pylint: disable=line-too-long
-                ),
-                md.text(
-                    f'{md.bold("Место прибытия: ")}{data["destination_place"] if data.get("destination_place") is not None else ""}'  # pylint: disable=line-too-long
-                ),
-                md.text(
-                    f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'  # pylint: disable=line-too-long
-                ),
-                sep="\n",
-            ),
-            parse_mode=ParseMode.MARKDOWN,
+            f"{'Заявка:'}\nВодитель: {user_from_db.first_name} {user_from_db.last_name if user_from_db.last_name is not None else ''}\n"  # pylint: disable=line-too-long
+            f"{'Связь с водителем: @' + nickname if nickname is not None else ''}\n"
+            f"Номер телефона: {user_from_db.phone_number if user_from_db.phone_number is not None else 'не указан'}\n"
+            f"Машина: {car.brand} {car.model} ({car.number_plate}\n"
+            f"Дата и время: {refactor_str(data['date_ride'].day if data.get('date_ride') is not None else '')}."
+            f"{refactor_str(data['date_ride'].month if data.get('date_ride') is not None else '')}.{data['date_ride'].year if data.get('date_ride') is not None else ''} в "  # pylint: disable=line-too-long
+            f"{refactor_str(data['time_ride'].hour if data.get('time_ride') is not None else '')}:{refactor_str(data['time_ride'].minute if data.get('time_ride') is not None else '')}\n"  # pylint: disable=line-too-long
+            f"Условия довоза: {data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}\n"  # pylint: disable=line-too-long
+            f"Место отправления: {data['departure_place'] if data.get('departure_place') is not None else ''}\n"
+            f"Место прибытия: {data['destination_place'] if data.get('destination_place') is not None else ''}\n"
+            f"Количество мест: {data['seats_number'] if data.get('seats_number') is not None else ''} ",
         )
         await RideRequestTable.add(post_message_id=post_in_channel.message_id, **data)
 
