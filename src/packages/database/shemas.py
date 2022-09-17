@@ -52,10 +52,7 @@ class User(BaseModel):
     __tablename__ = "users"
     id = Column(Integer(), primary_key=True)
     id_from_tg = Column(Integer(), nullable=False, unique=True)
-    first_name = Column(String(50))
-    last_name = Column(String(50))
     id_from_car = Column(Integer())
-    phone_number = Column(String(10))
     tg_id = relationship("TgProfile", cascade="all,delete,delete-orphan", passive_deletes=True)
     car_id = relationship("Car", cascade="all,delete,delete-orphan", passive_deletes=True)
     query: sql.select
