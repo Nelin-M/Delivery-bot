@@ -12,15 +12,15 @@ class UserTable:
     """
 
     @staticmethod
-    async def add(id_from_tg: int, id_from_car: int or None):
+    async def add(tg_id: int, car_id: int or None):
         """
         The method to add a record to a table users
-        @param id_from_tg: id from telegram
-        @param id_from_car: car_id from cars table
+        @param tg_id: id from telegram
+        @param car_id: car_id from cars table
         @return: id of the user added to the table users
         """
         try:
-            user = User(id_from_tg=id_from_tg, id_from_car=id_from_car)
+            user = User(tg_id=tg_id, car_id=car_id)
             await user.create()
             return user
         except UniqueViolationError as exception:
@@ -38,13 +38,13 @@ class UserTable:
         return user
 
     @staticmethod
-    async def get_by_telegram_id(id_from_tg: int) -> User:
+    async def get_by_telegram_id(tg_id: int) -> User:
         """
         This method returns User object
-        @param id_from_tg: telegram id
+        @param tg_id: telegram id
         @return: User
         """
-        user = await User.query.where(User.id_from_tg == id_from_tg).gino.first()
+        user = await User.query.where(User.tg_id == tg_id).gino.first()
         return user
 
     # pylint: disable=W0622,C0103:

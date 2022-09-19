@@ -5,11 +5,10 @@ Initialising users ReplyKeyboards
 
 from .main_menu import main_menu_authorised
 from .main_menu import main_menu_unauthorised
-from .profile import profile_menu
-from .profile import profile_delete_menu
-from .profile import profile_data_confirmation
 from .my_car import car_added_menu
 from .my_car import add_car_menu
+from .my_car import car_create_confirmation_keyboard
+from .my_car import car_delete_confirmation
 from .ride_request_creation import date_keyboard
 from .ride_request_creation import time_keyboard
 from .ride_request_creation import default_keyboard
@@ -23,11 +22,10 @@ from .ride_request_creation import keyboard_main_profile
 __all__ = [
     "main_menu_authorised",
     "main_menu_unauthorised",
-    "profile_menu",
-    "profile_delete_menu",
-    "profile_data_confirmation",
     "add_car_menu",
     "car_added_menu",
+    "car_create_confirmation_keyboard",
+    "car_delete_confirmation",
     "date_keyboard",
     "time_keyboard",
     "keyboard_ok",

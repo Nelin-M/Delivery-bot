@@ -3,14 +3,14 @@ This module handles car profile commands
 """
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from src.packages.bot.filters import GroupMember, ChatWithABot, AuthorisedUser, HasCar
+from src.packages.bot.filters import GroupMember, ChatWithABot, HasCar
 from src.packages.bot.states import EditCarFSM, DeleteCarFSM
 from src.packages.database import DatabaseException, UserTable, CarTable
 from src.packages.bot.keyboards import buttons
 from src.packages.bot.loader import dispatcher
 
 
-@dispatcher.message_handler(ChatWithABot(), GroupMember(), AuthorisedUser(), HasCar(), text=["Мой автомобиль"])
+@dispatcher.message_handler(ChatWithABot(), GroupMember(), HasCar(), text=["Мой автомобиль"])
 async def car_info_car_added(message: types.Message):
     """
     This function shows user info
@@ -23,7 +23,7 @@ async def car_info_car_added(message: types.Message):
     )
 
 
-@dispatcher.message_handler(ChatWithABot(), GroupMember(), AuthorisedUser(), ~HasCar(), text=["Мой автомобиль"])
+@dispatcher.message_handler(ChatWithABot(), GroupMember(), ~HasCar(), text=["Мой автомобиль"])
 async def car_info_no_car(message: types.Message):
     """
     This function shows user info
@@ -35,7 +35,7 @@ async def car_info_no_car(message: types.Message):
     )
 
 
-@dispatcher.message_handler(ChatWithABot(), GroupMember(), AuthorisedUser(), text=["Добавить автомобиль"])
+@dispatcher.message_handler(ChatWithABot(), GroupMember(), text=["Добавить автомобиль"])
 async def edit_start(message: types.Message):
     """
     This function starts EditProfileFSM
@@ -93,7 +93,7 @@ async def edit_confirmation(message: types.Message, state: FSMContext):
         f"\nМарка: {data.get('brand')}"
         f"\nМодель: {data.get('model')}"
         f"\nГос.номер: {data.get('number_plate')}",
-        reply_markup=buttons.profile_data_confirmation,
+        reply_markup=buttons.car_create_confirmation_keyboard,
     )
     await EditCarFSM.next()
 
@@ -113,7 +113,7 @@ async def create_result_handling(message: types.Message, state: FSMContext):
             car_id = await CarTable.add(
                 model=data.get("model"), brand=data.get("brand"), number_plate=data.get("number_plate"), user_id=user.id
             )
-            await UserTable.update(user_id=user.id, data={"id_from_car": car_id})
+            await UserTable.update(user_id=user.id, data={"car_id": car_id})
             await message.answer(text="Автомобиль успешно добавлен!")
         # pylint: disable=R0801
         except DatabaseException as error:
@@ -144,7 +144,7 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
         try:
             data = await state.get_data()
             user = await UserTable.get_by_telegram_id(message.from_user.id)
-            await CarTable.update(car_id=user.id_from_car, data=data)
+            await CarTable.update(car_id=user.car_id, data=data)
             await message.answer(text="Автомобиль успешно изменён!")
         # pylint: disable=R0801
         except DatabaseException as error:
@@ -164,9 +164,7 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
 
 
 # pylint:disable=W0511
-@dispatcher.message_handler(
-    ChatWithABot(), GroupMember(), AuthorisedUser(), HasCar(), text=["Редактировать автомобиль"]
-)
+@dispatcher.message_handler(ChatWithABot(), GroupMember(), HasCar(), text=["Редактировать автомобиль"])
 async def update_car_info(message: types.Message):
     """
     This function shall start UpdateProfileFSM
@@ -176,7 +174,7 @@ async def update_car_info(message: types.Message):
     await edit_start(message=message)
 
 
-@dispatcher.message_handler(ChatWithABot(), GroupMember(), AuthorisedUser(), HasCar(), text=["Удалить автомобиль"])
+@dispatcher.message_handler(ChatWithABot(), GroupMember(), HasCar(), text=["Удалить автомобиль"])
 async def delete_start(message: types.Message):
     """
     This function starts DeleteProfileFSM
@@ -184,7 +182,7 @@ async def delete_start(message: types.Message):
     """
     await DeleteCarFSM.confirmation.set()
     await message.answer(
-        text="Вы действительно хотите удалить данный автомобиль?", reply_markup=buttons.profile_delete_menu
+        text="Вы действительно хотите удалить данный автомобиль?", reply_markup=buttons.car_delete_confirmation
     )
 
 
@@ -197,8 +195,8 @@ async def delete_result_handling(message: types.Message, state: FSMContext):
     """
     if message.text == "Да":
         user = await UserTable.get_by_telegram_id(message.from_user.id)
-        await CarTable.delete(user.id_from_car)
-        await UserTable.update(user_id=user.id, data={"id_from_car": None})
+        await CarTable.delete(user.car_id)
+        await UserTable.update(user_id=user.id, data={"car_id": None})
         await state.finish()
         await message.answer(
             text="Ваш автомобиль удалён, чтобы пользоваться сервисом без ограничений, создайте новый в меню"

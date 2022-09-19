@@ -13,7 +13,7 @@ from src.packages.loaders import env_variables
 from src.packages.database import UserTable, RideRequestTable, CarTable
 from src.packages.bot.keyboards import buttons
 from src.packages.bot.states import CreateRideRequest
-from src.packages.bot.filters import GroupMember, ChatWithABot, AuthorisedUser, HasCar
+from src.packages.bot.filters import GroupMember, ChatWithABot, HasCar
 
 channel_id = env_variables.get("CHANNEL_ID")
 
@@ -66,9 +66,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await message.answer("Вы в главном меню", reply_markup=buttons.main_menu_authorised)
 
 
-@dispatcher.message_handler(
-    ChatWithABot(), GroupMember(), AuthorisedUser(), HasCar(), Text(equals=["Создать заявку"], ignore_case=True)
-)
+@dispatcher.message_handler(ChatWithABot(), GroupMember(), HasCar(), Text(equals=["Создать заявку"], ignore_case=True))
 async def choice_date(message: types.Message):
     """
     This function transition to the state create ride request and choice ride data
@@ -78,9 +76,7 @@ async def choice_date(message: types.Message):
     await message.answer("Выберите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.date_keyboard)
 
 
-@dispatcher.message_handler(
-    ChatWithABot(), GroupMember(), AuthorisedUser(), ~HasCar(), Text(equals=["Создать заявку"], ignore_case=True)
-)
+@dispatcher.message_handler(ChatWithABot(), GroupMember(), ~HasCar(), Text(equals=["Создать заявку"], ignore_case=True))
 async def not_car(message: types.Message):
     """
     This function shows message use without car

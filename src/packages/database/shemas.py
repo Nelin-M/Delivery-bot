@@ -51,10 +51,10 @@ class User(BaseModel):
 
     __tablename__ = "users"
     id = Column(Integer(), primary_key=True)
-    id_from_tg = Column(Integer(), nullable=False, unique=True)
-    id_from_car = Column(Integer())
-    tg_id = relationship("TgProfile", cascade="all,delete,delete-orphan", passive_deletes=True)
-    car_id = relationship("Car", cascade="all,delete,delete-orphan", passive_deletes=True)
+    tg_id = Column(Integer(), nullable=False, unique=True)
+    car_id = Column(Integer())
+    telegram_profile = relationship("TgProfile", cascade="all,delete,delete-orphan", passive_deletes=True)
+    car = relationship("Car", cascade="all,delete,delete-orphan", passive_deletes=True)
     query: sql.select
 
 
