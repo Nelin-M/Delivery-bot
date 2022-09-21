@@ -74,7 +74,7 @@ keyboard_ok = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 keyboard_main_profile = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Мой профиль")]],
+    keyboard=[[KeyboardButton("Мой автомобиль")]],
     resize_keyboard=True,
 )
 keyboard_terms_delivery = ReplyKeyboardMarkup(
