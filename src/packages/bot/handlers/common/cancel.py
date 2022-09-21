@@ -12,4 +12,4 @@ async def cancel(message: types.Message):
     """
     Returns a response with a message to the user
     """
-    await message.answer("Захочешь поехать домой, возвращайся!!!")
+    await message.answer("Чтобы воспользоваться сервисом нажмите /start")

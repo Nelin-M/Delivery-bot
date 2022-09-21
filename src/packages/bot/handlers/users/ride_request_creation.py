@@ -1,6 +1,7 @@
 """
 This module for creating ride request
 """
+import re
 from datetime import datetime, date, time
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -51,6 +52,46 @@ def handler_time(str_time):
     return time(hour, minute, second)
 
 
+def validation_date(text):
+    """
+    This function validates the date entered by the user
+    @param text: text
+    """
+    return (
+        re.findall(r"\d\d\.\d\d", f"r'{text}'")
+        and int(text.split(".")[0]) >= 0
+        and int(text.split(".")[0]) <= 31
+        and int(text.split(".")[1]) >= 1
+        and int(text.split(".")[1]) < 12
+    )
+
+
+def validation_time(text):
+    """
+    This function validates the time entered by the user
+    @param text: text
+    """
+    return (
+        re.findall(r"\d\d:\d\d", f"r'{text}'")
+        and int(text.split(":")[0]) >= 0
+        and int(text.split(":")[0]) < 24
+        and int(text.split(":")[1]) >= 0
+        and int(text.split(":")[1]) < 60
+    )
+
+
+def validation_number_seats(text):
+    """
+    This function validates the number_seats entered by the user
+    @param text: text
+    """
+    try:
+        text = int(text)
+    except ValueError:
+        return False
+    return int(text) > 0 and int(text) < 8
+
+
 @dispatcher.message_handler(state="*", commands="Отмена")
 @dispatcher.message_handler(Text(equals="отмена", ignore_case=True), state="*")
 async def cancel_handler(message: types.Message, state: FSMContext):
@@ -73,7 +114,10 @@ async def choice_date(message: types.Message):
     @param message: Message object
     """
     await CreateRideRequest.date.set()
-    await message.answer("Выберите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.date_keyboard)
+    await message.answer(
+        "Выберите дату " + emoji.emojize(":calendar:") + " Или напишите дату в формате XX.XX",
+        reply_markup=buttons.date_keyboard,
+    )
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember(), ~HasCar(), Text(equals=["Создать заявку"], ignore_case=True))
@@ -83,7 +127,7 @@ async def not_car(message: types.Message):
     @param message: Message object
     """
     await message.answer(
-        "Для создания заявки необходимо добавить машину в разделе 'Мой профиль'\n" "Нажмите на кнопку ниже",
+        "Для создания заявки необходимо добавить машину в разделе 'Мой автомобиль'\n" "Нажмите на кнопку ниже",
         reply_markup=buttons.keyboard_main_profile,
     )
 
@@ -95,10 +139,22 @@ async def process_date(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
-    async with state.proxy() as data:
-        data["date_ride"] = handler_date(message.text)
-    await CreateRideRequest.next()
-    await message.answer("Выберите время" + emoji.emojize(":alarm_clock:"), reply_markup=buttons.time_keyboard)
+
+    if validation_date(message.text):
+        async with state.proxy() as data:
+            data["date_ride"] = handler_date(message.text)
+        await CreateRideRequest.next()
+        await message.answer(
+            "Напишите время " + emoji.emojize(":alarm_clock:") + "\nв формате XX:XX\n" + "Например 23:30",
+            reply_markup=buttons.default_keyboard,
+        )
+    else:
+        await message.reply("Вы указали дату в неверном формате")
+        await message.answer(
+            "Выберите дату " + emoji.emojize(":calendar:") + " Или напишите дату в формате XX.XX",
+            reply_markup=buttons.date_keyboard,
+        )
+        await CreateRideRequest.date.set()
 
 
 @dispatcher.message_handler(state=CreateRideRequest.time)
@@ -108,13 +164,23 @@ async def process_time(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
-    async with state.proxy() as data:
-        data["time_ride"] = handler_time(message.text)
-    await CreateRideRequest.next()
-    await message.answer(
-        "Введите условие довоза\n Например: 'за шоколадку' \n Или нажмите  'дальше'",
-        reply_markup=buttons.keyboard_terms_delivery,
-    )
+    if validation_time(message.text):
+        async with state.proxy() as data:
+            data["time_ride"] = handler_time(message.text)
+        await CreateRideRequest.next()
+        await message.answer(
+            "Введите условие довоза\n Например: 'за шоколадку' \n Или нажмите  'дальше'",
+            reply_markup=buttons.keyboard_terms_delivery,
+        )
+    else:
+        await message.reply(
+            "Вы указали время в неверном формате\n"
+            + "Напишите время "
+            + emoji.emojize(":alarm_clock:")
+            + "\nв формате XX:XX\n"
+            + "Например 23:30"
+        )
+        await CreateRideRequest.time.set()
 
 
 @dispatcher.message_handler(state=CreateRideRequest.delivery_terms)
@@ -165,43 +231,46 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
-    async with state.proxy() as data:
-        data["seats_number"] = int(message.text)
-        user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
-        car = await CarTable.get_by_user_id(user_from_db.id)
-    await CreateRideRequest.next()
-    await message.answer(
-        "Подтвердите создание заявки  " + emoji.emojize(":check_mark_button:"), reply_markup=buttons.keyboard_ok
-    )
-    await bot.send_message(
-        message.chat.id,
-        md.text(
+    if validation_number_seats(message.text):
+        async with state.proxy() as data:
+            data["seats_number"] = int(message.text)
+            user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
+            car = await CarTable.get_by_user_id(user_from_db.id)
+        await CreateRideRequest.next()
+        await message.answer(
+            "Подтвердите создание заявки  " + emoji.emojize(":check_mark_button:"), reply_markup=buttons.keyboard_ok
+        )
+        await bot.send_message(
+            message.chat.id,
             md.text(
-                f'{md.bold("Водитель: ")}{message.from_user.first_name if message.from_user.first_name is not None else ""} {message.from_user.last_name if message.from_user.last_name is not None else ""} '  # pylint: disable=line-too-long
+                md.text(f'{md.bold("Водитель: ")}[{message.from_user.first_name}]({message.from_user.url}) '),
+                md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
+                md.text(
+                    f'{md.bold("Дата и время: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'  # pylint: disable=line-too-long
+                    f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.{data["date_ride"].year if data.get("date_ride") is not None else ""} в '  # pylint: disable=line-too-long
+                    f'{refactor_str(data["time_ride"].hour if data.get("time_ride") is not None else "")}:{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'  # pylint: disable=line-too-long
+                ),
+                md.text(
+                    f"{md.bold('Условия довоза: ')}"
+                    f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
+                ),
+                md.text(
+                    f'{md.bold("Место отправления: ")}{data["departure_place"] if data.get("departure_place") is not None else ""}'  # pylint: disable=line-too-long
+                ),
+                md.text(
+                    f'{md.bold("Место прибытия: ")}{data["destination_place"] if data.get("destination_place") is not None else ""}'  # pylint: disable=line-too-long
+                ),
+                md.text(
+                    f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'  # pylint: disable=line-too-long
+                ),
+                sep="\n",
             ),
-            md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
-            md.text(
-                f'{md.bold("Дата и время: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'  # pylint: disable=line-too-long
-                f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.{data["date_ride"].year if data.get("date_ride") is not None else ""} в '  # pylint: disable=line-too-long
-                f'{refactor_str(data["time_ride"].hour if data.get("time_ride") is not None else "")}:{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'  # pylint: disable=line-too-long
-            ),
-            md.text(
-                f"{md.bold('Условия довоза: ')}"
-                f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
-            ),
-            md.text(
-                f'{md.bold("Место отправления: ")}{data["departure_place"] if data.get("departure_place") is not None else ""}'  # pylint: disable=line-too-long
-            ),
-            md.text(
-                f'{md.bold("Место прибытия: ")}{data["destination_place"] if data.get("destination_place") is not None else ""}'  # pylint: disable=line-too-long
-            ),
-            md.text(
-                f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'  # pylint: disable=line-too-long
-            ),
-            sep="\n",
-        ),
-        parse_mode=ParseMode.MARKDOWN,
-    )
+            parse_mode=ParseMode.MARKDOWN,
+        )
+    else:
+        await message.reply("Вы указали количество мест в неверном формате\n")
+        await message.answer("Выберите количество мест:", reply_markup=buttons.number_of_seats_keyboard)
+        await CreateRideRequest.number_of_seats.set()
 
 
 @dispatcher.message_handler(state=CreateRideRequest.driver)
@@ -218,16 +287,11 @@ async def process_driver(message: types.Message, state: FSMContext):
         data = await state.get_data()
         car = await CarTable.get_by_user_id(user_from_db.id)
         await state.finish()
-        await bot.send_message(message.chat.id, "Данную заявку вы сможете найти в нижнем меню -> «Мои заявки»")
         await bot.send_message(
             message.chat.id,
             md.text(
-                md.text(f'{md.code("Заявка создана")}'),
-                md.text(
-                    f'{md.bold("Водитель: ")}'
-                    f'{message.from_user.first_name if message.from_user.first_name is not None else ""} '
-                    f'{message.from_user.last_name if message.from_user.last_name is not None else ""} '
-                ),
+                md.text("Заявка создана"),
+                md.text(f'{md.bold("Водитель: ")}[{message.from_user.first_name}]({message.from_user.url})'),
                 md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
                 md.text(
                     f'{md.bold("Дата и время: ")}'
@@ -255,10 +319,11 @@ async def process_driver(message: types.Message, state: FSMContext):
             reply_markup=buttons.main_menu_authorised,
             parse_mode=ParseMode.MARKDOWN,
         )
+        await bot.send_message(message.chat.id, "Данную заявку вы сможете найти в нижнем меню -> «Мои заявки»")
         post_in_channel = await bot.send_message(
             channel_id,
             md.text(
-                md.text(f'{md.code("Заявка создана")}'),
+                md.text("Заявка создана"),
                 md.text(
                     f'{md.bold("Водитель: ")}[{message.from_user.first_name}]({message.from_user.url}) '
                     f'{message.from_user.last_name if message.from_user.last_name is not None else ""} '
