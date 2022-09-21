@@ -68,22 +68,6 @@ class GroupMemberCallback(BoundFilter):
         return chat_member.is_chat_member()
 
 
-class AuthorisedUser(BoundFilter):
-    """
-    Checks if user authorised
-    """
-
-    # pylint:disable=R0201,W0221,W0511
-    async def check(self, message: types.Message):
-        """
-        Overwritten checker
-        @param message:
-        @return:
-        """
-        user = await UserTable.get_by_telegram_id(message.from_user.id)
-        return bool(user)
-
-
 class HasCar(BoundFilter):
     """
     Checks if user has car

@@ -98,5 +98,4 @@ class RideRequestTable:
         # try:
         ride_request = await cls.get_single_ride_request(ride_request_id)
         await ride_request.delete()
-        # except:
-        #     pass
+        # except AttributeError:

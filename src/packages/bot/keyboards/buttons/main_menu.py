@@ -7,7 +7,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 main_menu_authorised = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton("Создать заявку"), KeyboardButton("Мои заявки"), KeyboardButton("Мой профиль")],
+        [KeyboardButton("Создать заявку"), KeyboardButton("Мои заявки"), KeyboardButton("Мой автомобиль")],
         [KeyboardButton("Обратная связь"), KeyboardButton("Назад")],
     ],
     resize_keyboard=True,

@@ -4,7 +4,7 @@ Initializing modules
 
 from aiogram import Dispatcher
 
-from .users import ChatWithABot, GroupMember, AuthorisedUser, ChatWithABotCallback, GroupMemberCallback, HasCar
+from .users import ChatWithABot, GroupMember, ChatWithABotCallback, GroupMemberCallback, HasCar
 
 
 def setup_filters(dispatcher: Dispatcher):
@@ -13,7 +13,6 @@ def setup_filters(dispatcher: Dispatcher):
     """
 
     dispatcher.filters_factory.bind(GroupMember)
-    dispatcher.filters_factory.bind(AuthorisedUser)
     dispatcher.filters_factory.bind(ChatWithABot)
     dispatcher.filters_factory.bind(ChatWithABotCallback)
     dispatcher.filters_factory.bind(GroupMemberCallback)

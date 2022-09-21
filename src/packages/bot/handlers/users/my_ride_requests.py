@@ -7,8 +7,8 @@ import aiogram.utils.markdown as md
 
 from src.packages.database import DatabaseException
 
-# from src.packages.loaders import env_variables
-from src.packages.bot.filters import GroupMember, ChatWithABot, AuthorisedUser
+from src.packages.loaders import env_variables
+from src.packages.bot.filters import GroupMember, ChatWithABot
 from src.packages.bot.loader import dispatcher, bot
 from src.packages.database import UserTable, RideRequestTable
 
@@ -22,7 +22,7 @@ def refactor_str(str_input):
     return f"{str_input if len(str_input) == 2 else '0' + str_input}"
 
 
-@dispatcher.message_handler(ChatWithABot(), GroupMember(), AuthorisedUser(), text=["Мои заявки"])
+@dispatcher.message_handler(ChatWithABot(), GroupMember(), text=["Мои заявки"])
 async def my_ride_requests_start(message: types.Message):
     """
     @param message: Message object
@@ -30,8 +30,8 @@ async def my_ride_requests_start(message: types.Message):
     try:
         user = await UserTable.get_by_telegram_id(message.from_user.id)
         all_ride_requests = await RideRequestTable.get_user_ride_requests(user.id)
-        if all_ride_requests is None:
-            bot.send_message(message.chat.id, "У вас нет созданных заявок.")
+        if len(all_ride_requests) == 0:
+            await bot.send_message(message.chat.id, "У вас нет созданных заявок.")
             return
         all_ride_requests.reverse()
         for ride_request in all_ride_requests:
@@ -39,12 +39,9 @@ async def my_ride_requests_start(message: types.Message):
                 message.chat.id,
                 md.text(
                     md.text(
-                        # pylint: disable=line-too-long
-                        f'{md.bold("Водитель: ")}{user.first_name} {user.last_name if user.last_name is not None else ""}'
-                    ),
-                    md.text(
-                        f'{md.bold("Номер телефона: ")}'
-                        f'{user.phone_number if user.phone_number is not None else "не указан"}'
+                        f'{md.bold("Водитель: ")}'
+                        f'{message.from_user.first_name if message.from_user.first_name is not None else ""} '
+                        f'{message.from_user.last_name if message.from_user.last_name is not None else ""} '
                     ),
                     md.text(
                         f'{md.bold("Дата и время: ")}{refactor_str(ride_request.date.day)}.'
@@ -94,9 +91,9 @@ async def send_message(call: CallbackQuery):
     Handler for the delete button. `call.data` is passed the id of the ride request to be deleted
     :param call: CallbackQuery object
     """
-    # ride_request_id = call.data.split('|')[1]
-    # RideRequestTable.delete(ride_request_id)
-    # channel_id = env_variables.get("GROUP_ID")
-    # ride_request = RideRequestTable.get_by_id(ride_request_id)
-    # bot.delete_message(channel_id, ride_request.tg_message_id)
+    ride_request_id = int(call.data.split("|")[1])
+    ride_request = await RideRequestTable.get_single_ride_request(ride_request_id)
+    channel_id = env_variables.get("CHANNEL_ID")
+    await bot.delete_message(channel_id, ride_request.post_message_id)
+    await RideRequestTable.delete(ride_request_id)
     await call.answer("Заявка успешно удалена.", show_alert=True)
