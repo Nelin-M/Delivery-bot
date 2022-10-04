@@ -17,6 +17,7 @@ from src.packages.bot.states import CreateRideRequest
 from src.packages.bot.filters import GroupMember, ChatWithABot, HasCar
 
 channel_id = env_variables.get("CHANNEL_ID")
+channel_link = env_variables.get("CHANNEL_LINK")
 
 
 def refactor_str(str_input):
@@ -145,11 +146,11 @@ async def process_date(message: types.Message, state: FSMContext):
             data["date_ride"] = handler_date(message.text)
         await CreateRideRequest.next()
         await message.answer(
-            "Напишите время " + emoji.emojize(":alarm_clock:") + "\nв формате XX:XX\n" + "Например 23:30",
-            reply_markup=buttons.default_keyboard,
+            "Выберите время из предложенных или укажите время в формате XX:XX.\n" + "Например 07:15",
+            reply_markup=buttons.time_keyboard,
         )
     else:
-        await message.reply("Вы указали дату в неверном формате")
+        await message.reply("Вы указали дату в неверном формате❗")
         await message.answer(
             "Выберите дату " + emoji.emojize(":calendar:") + " Или напишите дату в формате XX.XX",
             reply_markup=buttons.date_keyboard,
@@ -173,12 +174,10 @@ async def process_time(message: types.Message, state: FSMContext):
             reply_markup=buttons.keyboard_terms_delivery,
         )
     else:
-        await message.reply(
-            "Вы указали время в неверном формате\n"
-            + "Напишите время "
-            + emoji.emojize(":alarm_clock:")
-            + "\nв формате XX:XX\n"
-            + "Например 23:30"
+        await message.reply("Вы указали время в неверном формате❗\n")
+        await message.answer(
+            "Выберите время из предложенных или укажите время в формате XX:XX.\n" + "Например 07:15",
+            reply_markup=buttons.time_keyboard,
         )
         await CreateRideRequest.time.set()
 
@@ -243,22 +242,27 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
         await bot.send_message(
             message.chat.id,
             md.text(
-                md.text(f'{md.bold("Водитель: ")}[{message.from_user.first_name}]({message.from_user.url}) '),
-                md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
                 md.text(
-                    f'{md.bold("Дата и время: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'  # pylint: disable=line-too-long
+                    f'{emoji.emojize(":bust_in_silhouette:")}{md.bold("Водитель: ")}{message.from_user.first_name if message.from_user.first_name is not None else ""} {message.from_user.last_name if message.from_user.last_name is not None else ""} '  # pylint: disable=line-too-long
+                ),
+                md.text(
+                    f'{emoji.emojize(":oncoming_automobile:")}{md.bold("Машина: ")}'
+                    f"{car.brand} {car.model} ({car.number_plate})"
+                ),
+                md.text(
+                    f'{emoji.emojize(":calendar:")}{md.bold("Дата и время: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'  # pylint: disable=line-too-long
                     f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.{data["date_ride"].year if data.get("date_ride") is not None else ""} в '  # pylint: disable=line-too-long
                     f'{refactor_str(data["time_ride"].hour if data.get("time_ride") is not None else "")}:{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'  # pylint: disable=line-too-long
                 ),
                 md.text(
-                    f"{md.bold('Условия довоза: ')}"
+                    f"{md.bold('Условия довоза: ')}\n"
                     f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
                 ),
                 md.text(
-                    f'{md.bold("Место отправления: ")}{data["departure_place"] if data.get("departure_place") is not None else ""}'  # pylint: disable=line-too-long
+                    f'{md.bold("Место отправления:")}\n{data["departure_place"] if data.get("departure_place") is not None else ""}'  # pylint: disable=line-too-long
                 ),
                 md.text(
-                    f'{md.bold("Место прибытия: ")}{data["destination_place"] if data.get("destination_place") is not None else ""}'  # pylint: disable=line-too-long
+                    f'{md.bold("Место прибытия:")}\n{data["destination_place"] if data.get("destination_place") is not None else ""}'  # pylint: disable=line-too-long
                 ),
                 md.text(
                     f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'  # pylint: disable=line-too-long
@@ -268,7 +272,7 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
             parse_mode=ParseMode.MARKDOWN,
         )
     else:
-        await message.reply("Вы указали количество мест в неверном формате\n")
+        await message.reply("Вы указали количество мест в неверном формате❗\n")
         await message.answer("Выберите количество мест:", reply_markup=buttons.number_of_seats_keyboard)
         await CreateRideRequest.number_of_seats.set()
 
@@ -291,10 +295,16 @@ async def process_driver(message: types.Message, state: FSMContext):
             message.chat.id,
             md.text(
                 md.text("Заявка создана"),
-                md.text(f'{md.bold("Водитель: ")}[{message.from_user.first_name}]({message.from_user.url})'),
-                md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
                 md.text(
-                    f'{md.bold("Дата и время: ")}'
+                    f'{emoji.emojize(":bust_in_silhouette:")}{md.bold("Водитель: ")}[{message.from_user.first_name}]({message.from_user.url}) '  # pylint: disable=line-too-long
+                    f'{message.from_user.last_name if message.from_user.last_name is not None else ""} '
+                ),
+                md.text(
+                    f'{emoji.emojize(":oncoming_automobile:")}{md.bold("Машина: ")}'
+                    f"{car.brand} {car.model} ({car.number_plate})"
+                ),
+                md.text(
+                    f'{emoji.emojize(":calendar:")}{md.bold("Дата и время: ")}'
                     f'{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'
                     f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.'
                     f'{data["date_ride"].year if data.get("date_ride") is not None else ""} в '
@@ -302,14 +312,14 @@ async def process_driver(message: types.Message, state: FSMContext):
                     f'{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'
                 ),
                 md.text(
-                    f"{md.bold('Условия довоза: ')}"
+                    f"{md.bold('Условия довоза: ')}\n"
                     f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
                 ),
                 md.text(
-                    f'{md.bold("Место отправления: ")}{data["departure_place"] if data.get("departure_place") is not None else ""}'  # pylint: disable=line-too-long
+                    f"{md.bold('Место отправления: ')}\n{data['departure_place'] if data.get('departure_place') is not None else ''}"  # pylint: disable=line-too-long
                 ),
                 md.text(
-                    f'{md.bold("Место прибытия: ")}{data["destination_place"] if data.get("destination_place") is not None else ""}'  # pylint: disable=line-too-long
+                    f'{md.bold("Место прибытия: ")}\n{data["destination_place"] if data.get("destination_place") is not None else ""}'  # pylint: disable=line-too-long
                 ),
                 md.text(
                     f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'  # pylint: disable=line-too-long
@@ -319,18 +329,26 @@ async def process_driver(message: types.Message, state: FSMContext):
             reply_markup=buttons.main_menu_authorised,
             parse_mode=ParseMode.MARKDOWN,
         )
-        await bot.send_message(message.chat.id, "Данную заявку вы сможете найти в нижнем меню -> «Мои заявки»")
+        await bot.send_message(
+            message.chat.id,
+            md.text(
+                f"Данную заявку вы сможете найти в нижнем меню -> «Мои заявки» и [в канале с заявками]({channel_link})"
+            ),
+            parse_mode=ParseMode.MARKDOWN,
+        )  # pylint: disable=line-too-long
         post_in_channel = await bot.send_message(
             channel_id,
             md.text(
-                md.text("Заявка создана"),
+                md.text("#водитель\n"),
                 md.text(
-                    f'{md.bold("Водитель: ")}[{message.from_user.first_name}]({message.from_user.url}) '
+                    f'{emoji.emojize(":bust_in_silhouette:")}{md.bold("Водитель: ")}[{message.from_user.first_name}]({message.from_user.url}) '  # pylint: disable=line-too-long
                     f'{message.from_user.last_name if message.from_user.last_name is not None else ""} '
                 ),
-                md.text(f'{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'),
                 md.text(
-                    f'{md.bold("Дата и время: ")}'
+                    f'{emoji.emojize(":oncoming_automobile:")}{md.bold("Машина: ")}{car.brand} {car.model} ({car.number_plate})'
+                ),  # pylint: disable=line-too-long
+                md.text(
+                    f'{emoji.emojize(":calendar:")}{md.bold("Дата и время: ")}'
                     f'{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'
                     f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.'
                     f'{data["date_ride"].year if data.get("date_ride") is not None else ""} в '
@@ -338,18 +356,19 @@ async def process_driver(message: types.Message, state: FSMContext):
                     f'{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'
                 ),
                 md.text(
-                    f"{md.bold('Условия довоза: ')}"
+                    f"{md.bold('Условия довоза: ')}\n"
                     f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
                 ),
                 md.text(
-                    f"{md.bold('Место отправления: ')}{data['departure_place'] if data.get('departure_place') is not None else ''}"  # pylint: disable=line-too-long
+                    f"{md.bold('Место отправления: ')}\n{data['departure_place'] if data.get('departure_place') is not None else ''}"  # pylint: disable=line-too-long
                 ),
                 md.text(
-                    f'{md.bold("Место прибытия: ")}{data["destination_place"] if data.get("destination_place") is not None else ""}'  # pylint: disable=line-too-long
+                    f'{md.bold("Место прибытия: ")}\n{data["destination_place"] if data.get("destination_place") is not None else ""}'  # pylint: disable=line-too-long
                 ),
                 md.text(
                     f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'  # pylint: disable=line-too-long
                 ),
+                md.text(f"Отправить свою заявку вы можете при помощи бота: {'@botlink'}"),
                 sep="\n",
             ),
             parse_mode=ParseMode.MARKDOWN,
