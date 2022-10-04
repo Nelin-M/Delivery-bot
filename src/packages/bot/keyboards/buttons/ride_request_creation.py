@@ -27,43 +27,9 @@ def str_button(days):
 
 date_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(str_button(1)), KeyboardButton(str_button(2)), KeyboardButton(str_button(3))],
-        [KeyboardButton(str_button(4)), KeyboardButton(str_button(5)), KeyboardButton(str_button(6))],
-        [KeyboardButton("Отмена")],
-    ],
-    resize_keyboard=True,
-)
-
-time_keyboard = ReplyKeyboardMarkup(
-    keyboard=[
-        [
-            KeyboardButton("22:00"),
-            KeyboardButton("22:10"),
-            KeyboardButton("22:20"),
-            KeyboardButton("22:30"),
-            KeyboardButton("22:40"),
-        ],
-        [
-            KeyboardButton("23:00"),
-            KeyboardButton("23:10"),
-            KeyboardButton("23:20"),
-            KeyboardButton("23:30"),
-            KeyboardButton("23:40"),
-        ],
-        [
-            KeyboardButton("00:00"),
-            KeyboardButton("00:10"),
-            KeyboardButton("00:20"),
-            KeyboardButton("00:30"),
-            KeyboardButton("00:40"),
-        ],
-        [
-            KeyboardButton("01:00"),
-            KeyboardButton("01:10"),
-            KeyboardButton("01:20"),
-            KeyboardButton("01:30"),
-            KeyboardButton("01:40"),
-        ],
+        [KeyboardButton(str_button(0)), KeyboardButton(str_button(1)), KeyboardButton(str_button(2))],
+        [KeyboardButton(str_button(3)), KeyboardButton(str_button(4)), KeyboardButton(str_button(5))],
+        [KeyboardButton(str_button(6)), KeyboardButton(str_button(7)), KeyboardButton(str_button(8))],
         [KeyboardButton("Отмена")],
     ],
     resize_keyboard=True,
@@ -98,6 +64,15 @@ number_of_seats_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton("1"), KeyboardButton("2")],
         [KeyboardButton("3"), KeyboardButton("4")],
+        [KeyboardButton("Отмена")],
+    ],
+    resize_keyboard=True,
+)
+time_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton("23:15"), KeyboardButton("23:45"), KeyboardButton("00:45")],
+        [KeyboardButton("01:15"), KeyboardButton("01:45"), KeyboardButton("02:15")],
+        [KeyboardButton("07:15"), KeyboardButton("08:15")],
         [KeyboardButton("Отмена")],
     ],
     resize_keyboard=True,
