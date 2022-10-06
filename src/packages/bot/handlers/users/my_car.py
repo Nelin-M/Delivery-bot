@@ -157,7 +157,7 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
         await edit_start(message)
     elif message.text == "Отмена":
         await state.finish()
-        await message.answer(text="Как будете готовы - возвращайтесь!")
+        await message.answer(text="Как будете готовы - возвращайтесь!", reply_markup=buttons.main_menu_authorised)
     else:
         await state.finish()
         await message.answer(text="Что-то пошло не так, попробуйте ещё раз :(")
@@ -199,11 +199,15 @@ async def delete_result_handling(message: types.Message, state: FSMContext):
         await UserTable.update(user_id=user.id, data={"car_id": None})
         await state.finish()
         await message.answer(
-            text="Ваш автомобиль удалён, чтобы пользоваться сервисом без ограничений, создайте новый в меню"
+            text="Ваш автомобиль удалён, чтобы пользоваться сервисом без ограничений, создайте новый в меню",
+            reply_markup=buttons.main_menu_authorised,
         )
     # pylint: disable=R0801
     elif message.text == "Отменить":
         await state.finish()
+        await message.answer(text="Как будете готовы - возвращайтесь!", reply_markup=buttons.main_menu_authorised)
     else:
         await state.finish()
-        await message.answer(text="Что-то пошло не так :(")
+        await message.answer(
+            text="Что-то пошло не так, попробуйте ещё раз :(", reply_markup=buttons.main_menu_authorised
+        )
