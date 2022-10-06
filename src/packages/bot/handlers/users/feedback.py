@@ -42,7 +42,7 @@ async def send_review_in_group(message: types.Message, state: FSMContext):
     await message.answer(
         "Спасибо, что оставили, отзыв о нашем сервисе, мы постараемся учесть все замечания и "
         "обязательно их добавить в следующем обновлении, чтобы стать ещё удобнее для вас!\n\n"
-        f"Ваш отзыв будет опубликован в канале [{group_parameters.title}]({group_parameters.invite_link})!!!",
+        f"Ваш отзыв будет опубликован \nв канале [{group_parameters.title}]({group_parameters.invite_link})",
         parse_mode=types.ParseMode.MARKDOWN,
     )
 
