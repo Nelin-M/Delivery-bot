@@ -114,7 +114,7 @@ async def create_result_handling(message: types.Message, state: FSMContext):
                 model=data.get("model"), brand=data.get("brand"), number_plate=data.get("number_plate"), user_id=user.id
             )
             await UserTable.update(user_id=user.id, data={"car_id": car_id})
-            await message.answer(text="Автомобиль успешно добавлен!")
+            await message.answer(text="Автомобиль успешно добавлен!", reply_markup=buttons.main_menu_authorised)
         # pylint: disable=R0801
         except DatabaseException as error:
             await message.answer(text=str(error))
@@ -122,14 +122,16 @@ async def create_result_handling(message: types.Message, state: FSMContext):
             await state.finish()
     elif message.text == "Хочу исправить":
         await state.finish()
-        await message.answer(text="Давайте попробуем снова")
+        await message.answer(text="Давайте попробуем снова", reply_markup=buttons.main_menu_authorised)
         await edit_start(message)
     elif message.text == "Отмена":
         await state.finish()
-        await message.answer(text="Как будете готовы - возвращайтесь!")
+        await message.answer(text="Как будете готовы - возвращайтесь!", reply_markup=buttons.main_menu_authorised)
     else:
         await state.finish()
-        await message.answer(text="Что-то пошло не так, попробуйте ещё раз :(")
+        await message.answer(
+            text="Что-то пошло не так, попробуйте ещё раз :(", reply_markup=buttons.main_menu_authorised
+        )
 
 
 @dispatcher.message_handler(HasCar(), state=EditCarFSM.result_handling)
@@ -145,7 +147,7 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
             data = await state.get_data()
             user = await UserTable.get_by_telegram_id(message.from_user.id)
             await CarTable.update(car_id=user.car_id, data=data)
-            await message.answer(text="Автомобиль успешно изменён!")
+            await message.answer(text="Автомобиль успешно изменён!", reply_markup=buttons.main_menu_authorised)
         # pylint: disable=R0801
         except DatabaseException as error:
             await message.answer(text=str(error))
@@ -160,7 +162,9 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
         await message.answer(text="Как будете готовы - возвращайтесь!", reply_markup=buttons.main_menu_authorised)
     else:
         await state.finish()
-        await message.answer(text="Что-то пошло не так, попробуйте ещё раз :(")
+        await message.answer(
+            text="Что-то пошло не так, попробуйте ещё раз :(", reply_markup=buttons.main_menu_authorised
+        )
 
 
 # pylint:disable=W0511
