@@ -2,6 +2,7 @@
 This module represents ride request creation ReplyKeyboards
 """
 import datetime
+
 import emoji
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
@@ -70,9 +71,8 @@ number_of_seats_keyboard = ReplyKeyboardMarkup(
 )
 time_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton("23:15"), KeyboardButton("23:45"), KeyboardButton("00:45")],
-        [KeyboardButton("01:15"), KeyboardButton("01:45"), KeyboardButton("02:15")],
-        [KeyboardButton("07:15"), KeyboardButton("08:15")],
+        [KeyboardButton("23:15"), KeyboardButton("00:45"), KeyboardButton("01:15")],
+        [KeyboardButton("02:15"), KeyboardButton("07:15"), KeyboardButton("08:15")],
         [KeyboardButton("Отмена")],
     ],
     resize_keyboard=True,

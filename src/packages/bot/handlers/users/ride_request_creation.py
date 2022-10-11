@@ -3,18 +3,20 @@ This module for creating ride request
 """
 import re
 from datetime import datetime, date, time
+
+import aiogram.utils.markdown as md
+import emoji
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ParseMode
-import emoji
-import aiogram.utils.markdown as md
-from src.packages.bot.loader import dispatcher, bot
-from src.packages.loaders import env_variables
-from src.packages.database import UserTable, RideRequestTable, CarTable
-from src.packages.bot.keyboards import buttons
-from src.packages.bot.states import CreateRideRequest
+
 from src.packages.bot.filters import GroupMember, ChatWithABot, HasCar
+from src.packages.bot.keyboards import buttons
+from src.packages.bot.loader import dispatcher, bot
+from src.packages.bot.states import CreateRideRequest
+from src.packages.database import UserTable, RideRequestTable, CarTable
+from src.packages.loaders import env_variables
 
 channel_id = env_variables.get("CHANNEL_ID")
 channel_link = env_variables.get("CHANNEL_LINK")
@@ -248,7 +250,7 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
                 ),
                 md.text(
                     f'{emoji.emojize(":oncoming_automobile:")}{md.bold(" Машина: ")}'
-                    f"{car.brand} {car.model} ({car.number_plate})"
+                    f"{car.brand} {car.model} ({car.number_plate[:6]} {car.number_plate[6:]})"
                 ),
                 md.text(
                     f'{emoji.emojize(":calendar:")}{md.bold(" Дата и время: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'  # pylint: disable=line-too-long
@@ -302,7 +304,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                 ),
                 md.text(
                     f'{emoji.emojize(":oncoming_automobile:")}{md.bold(" Машина: ")}'
-                    f"{car.brand} {car.model} ({car.number_plate})"
+                    f"{car.brand} {car.model} ({car.number_plate[:6]} {car.number_plate[6:]})"
                 ),
                 md.text(
                     f'{emoji.emojize(":calendar:")}{md.bold(" Дата и время: ")}'
@@ -346,7 +348,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                     f'{message.from_user.last_name if message.from_user.last_name is not None else ""} '
                 ),
                 md.text(
-                    f'{emoji.emojize(":oncoming_automobile:")}{md.bold(" Машина: ")}{car.brand} {car.model} ({car.number_plate})'
+                    f'{emoji.emojize(":oncoming_automobile:")}{md.bold(" Машина: ")}{car.brand} {car.model} ({car.number_plate[:6]} {car.number_plate[6:]})'
                 ),  # pylint: disable=line-too-long
                 md.text(
                     f'{emoji.emojize(":calendar:")}{md.bold(" Дата и время: ")}'
