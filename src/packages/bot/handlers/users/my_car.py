@@ -1,13 +1,16 @@
 """
 This module handles car profile commands
 """
+import re
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+
 from src.packages.bot.filters import GroupMember, ChatWithABot, HasCar
-from src.packages.bot.states import EditCarFSM, DeleteCarFSM
-from src.packages.database import DatabaseException, UserTable, CarTable
 from src.packages.bot.keyboards import buttons
 from src.packages.bot.loader import dispatcher
+from src.packages.bot.states import EditCarFSM, DeleteCarFSM
+from src.packages.database import DatabaseException, UserTable, CarTable
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember(), HasCar(), text=["Мой автомобиль"])
@@ -62,6 +65,7 @@ async def edit_model(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
+
     await state.update_data(brand=message.text)
     await message.answer(text="Введите модель:")
     await EditCarFSM.next()
@@ -75,7 +79,7 @@ async def edit_number_plate(message: types.Message, state: FSMContext):
     @param state: FSMContext object
     """
     await state.update_data(model=message.text)
-    await message.answer(text="Введите гос.номер:")
+    await message.answer(text="Введите гос. номер, в формате: серия, номер, серия, код региона (A000AA123)")
     await EditCarFSM.next()
 
 
@@ -86,16 +90,25 @@ async def edit_confirmation(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
-    await state.update_data(number_plate=message.text)
-    data = await state.get_data()
-    await message.answer(
-        text=f"Проверьте введённые данные:"
-        f"\nМарка: {data.get('brand')}"
-        f"\nМодель: {data.get('model')}"
-        f"\nГос.номер: {data.get('number_plate')}",
-        reply_markup=buttons.car_create_confirmation_keyboard,
-    )
-    await EditCarFSM.next()
+    regexp = re.compile(r"^[АВЕКМНОРСТУХABEKMHOPCTYX]\d{3}[АВЕКМНОРСТУХABEKMHOPCTYX]{2}(?P<reg>\d{2,3})$")
+    car_id = message.text.upper().strip()
+    match = regexp.match(car_id)
+
+    if match:
+        await state.update_data(number_plate=car_id)
+        data = await state.get_data()
+        await message.answer(
+            text=f"Проверьте введённые данные:"
+            f"\nМарка: {data.get('brand')}"
+            f"\nМодель: {data.get('model')}"
+            f"\nГос.номер: {data.get('number_plate')[:6]} {data.get('number_plate')[6:]}",
+            reply_markup=buttons.car_create_confirmation_keyboard,
+        )
+        await EditCarFSM.next()
+    else:
+        await message.answer(
+            text="Гос. номер введен неверно, повторите ввод, в формате: серия, номер, серия, " "код региона (A000AA123)"
+        )
 
 
 @dispatcher.message_handler(~HasCar(), state=EditCarFSM.result_handling)

@@ -11,7 +11,6 @@ async def bot_hints(dispatcher):
     await dispatcher.bot.set_my_commands(
         [
             types.BotCommand("start", "Запустить бота"),
-            types.BotCommand("help", "О боте"),
             types.BotCommand("menu", "Меню"),
         ]
     )
