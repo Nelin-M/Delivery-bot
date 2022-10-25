@@ -6,8 +6,8 @@ import re
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from src.packages.bot.filters import GroupMember, ChatWithABot, HasCar
-from src.packages.bot.keyboards import buttons
+from src.packages.bot.filters import GroupMember, ChatWithABot, ChatWithABotCallback, GroupMemberCallback, HasCar
+from src.packages.bot.keyboards import buttons, inline_buttons
 from src.packages.bot.loader import dispatcher
 from src.packages.bot.states import EditCarFSM, DeleteCarFSM
 from src.packages.database import DatabaseException, UserTable, CarTable
@@ -34,27 +34,39 @@ async def car_info_no_car(message: types.Message):
     """
     await message.answer(
         text="Здесь вы можете добавить информацию о вашем авто, чтобы создавать заявки",
-        reply_markup=buttons.add_car_menu,
+        reply_markup=inline_buttons.add_car_menu,
     )
 
 
-@dispatcher.message_handler(ChatWithABot(), GroupMember(), text=["Добавить автомобиль"])
+@dispatcher.callback_query_handler(ChatWithABotCallback(), GroupMemberCallback(), text="Добавить автомобиль")
 async def edit_start(message: types.Message):
     """
     This function starts EditProfileFSM
     @param message: Message object
+    @param call: Callback query object
     """
+
     await EditCarFSM.brand.set()
     await edit_brand(message=message)
 
 
-@dispatcher.message_handler(state=EditCarFSM.brand)
+@dispatcher.callback_query_handler(state=EditCarFSM.brand)
 async def edit_brand(message: types.Message):
     """
     This state function asks for user first name
     @param message: Message object
+    @param call: Callback query object
     """
-    await message.answer(text="Введите марку:")
+    if isinstance(message, types.CallbackQuery):
+        await message.message.answer(
+            text="Введите марку:",
+            reply_markup=buttons.car_edit_cancel,
+        )
+    else:
+        await message.answer(
+            text="Введите марку:",
+            reply_markup=buttons.car_edit_cancel,
+        )
     await EditCarFSM.next()
 
 
@@ -65,9 +77,15 @@ async def edit_model(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
+    if message.text == "Отмена":
+        await message.answer(text="Вы в главном меню", reply_markup=buttons.main_menu_authorised)
+        return await state.finish()
 
     await state.update_data(brand=message.text)
-    await message.answer(text="Введите модель:")
+    await message.answer(
+        text="Введите модель:",
+        reply_markup=buttons.car_edit_cancel,
+    )
     await EditCarFSM.next()
 
 
@@ -78,8 +96,15 @@ async def edit_number_plate(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
+    if message.text == "Отмена":
+        await message.answer(text="Вы в главном меню", reply_markup=buttons.main_menu_authorised)
+        return await state.finish()
+
     await state.update_data(model=message.text)
-    await message.answer(text="Введите гос. номер, в формате: серия, номер, серия, код региона (A000AA123)")
+    await message.answer(
+        text="Введите гос. номер, в формате: серия, номер, серия, код региона (A000AA123)",
+        reply_markup=buttons.car_edit_cancel,
+    )
     await EditCarFSM.next()
 
 
@@ -94,6 +119,10 @@ async def edit_confirmation(message: types.Message, state: FSMContext):
     car_id = message.text.upper().strip()
     match = regexp.match(car_id)
 
+    if message.text == "Отмена":
+        await message.answer(text="Вы в главном меню", reply_markup=buttons.main_menu_authorised)
+        return await state.finish()
+
     if match:
         await state.update_data(number_plate=car_id)
         data = await state.get_data()
@@ -105,7 +134,7 @@ async def edit_confirmation(message: types.Message, state: FSMContext):
             reply_markup=buttons.car_create_confirmation_keyboard,
         )
         await EditCarFSM.next()
-    else:
+    elif match is None:
         await message.answer(
             text="Гос. номер введен неверно, повторите ввод, в формате: серия, номер, серия, " "код региона (A000AA123)"
         )
@@ -136,7 +165,7 @@ async def create_result_handling(message: types.Message, state: FSMContext):
     elif message.text == "Хочу исправить":
         await state.finish()
         await message.answer(text="Давайте попробуем снова", reply_markup=buttons.main_menu_authorised)
-        await edit_start(message)
+        await edit_start(message=message)
     elif message.text == "Отмена":
         await state.finish()
         await message.answer(text="Как будете готовы - возвращайтесь!", reply_markup=buttons.main_menu_authorised)
@@ -169,7 +198,7 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
     elif message.text == "Хочу исправить":
         await state.finish()
         await message.answer(text="Давайте попробуем снова")
-        await edit_start(message)
+        await edit_start(message=message)
     elif message.text == "Отмена":
         await state.finish()
         await message.answer(text="Как будете готовы - возвращайтесь!", reply_markup=buttons.main_menu_authorised)
