@@ -24,3 +24,17 @@ car_create_confirmation_keyboard = ReplyKeyboardMarkup(
 car_delete_confirmation = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton("Да"), KeyboardButton("Отменить")]], resize_keyboard=True, one_time_keyboard=True
 )
+
+car_edit_cancel = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton("Отмена")]], resize_keyboard=True, one_time_keyboard=True
+)
+
+car_create_confirmation_keyboard = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton("Всё верно"), KeyboardButton("Хочу исправить")], [KeyboardButton("Отмена")]],
+    resize_keyboard=True,
+    one_time_keyboard=True,
+)
+
+car_delete_confirmation = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton("Да"), KeyboardButton("Отменить")]], resize_keyboard=True, one_time_keyboard=True
+)
