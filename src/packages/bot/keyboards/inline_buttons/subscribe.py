@@ -11,6 +11,7 @@ subscribe = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="Подписаться", url=group_link),
+            InlineKeyboardButton(text="Проверить подписку", callback_data="Проверить подписку"),
         ]
     ],
 )
