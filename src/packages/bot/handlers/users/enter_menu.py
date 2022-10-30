@@ -19,8 +19,7 @@ async def user_start(message: types.Message):
         user = await UserTable.add(tg_id=message.from_user.id, car_id=None)
         await TelegramProfileTable.add(tg_id=message.from_user.id, user_id=user.id, nickname=message.from_user.username)
     await message.answer(
-        f"Привет, {message.from_user.first_name}, ты пользователь группы Delivery_bot!"
-        "Чтобы начать работу нажми /menu"
+        "Поздравляем, ваша заявка одобрена. Теперь можете смело нажать кнопку /menu и " "начать пользоваться ботом!"
     )
 
 
