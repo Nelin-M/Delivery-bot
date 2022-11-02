@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from src.packages.bot.filters import GroupMember, ChatWithABot, ChatWithABotCallback, GroupMemberCallback
-from src.packages.bot.keyboards import inline_buttons
+from src.packages.bot.keyboards import inline_buttons, buttons
 from src.packages.bot.loader import dispatcher, bot
 from src.packages.bot.states import CreateReview
 from src.packages.loaders import env_variables
@@ -27,7 +27,9 @@ async def write_review(call: types.CallbackQuery):
     """
     Reaction to the text in inline button "Оставить отзыв" and running the state machine
     """
-    await call.message.answer("Ваш отзыв будет опубликован в группе, ждем предложений и пожеланий:")
+    await call.message.answer(
+        "Ваш отзыв будет опубликован в группе, ждем предложений и пожеланий:", reply_markup=buttons.car_edit_cancel
+    )
     await CreateReview.review_text.set()
 
 
@@ -36,6 +38,9 @@ async def send_review_in_group(message: types.Message, state: FSMContext):
     """
     Shutting down the state machine and sending a message to the feedback chat
     """
+    if message.text == "Отмена":
+        await message.answer(text="Вы в главном меню", reply_markup=buttons.main_menu_authorised)
+        return await state.finish()
     group_parameters = await message.bot.get_chat(env_variables.get("CHANNEL_FEEDBACK_ID"))
     answer = f"{message.text}\n\n[{message.from_user.username}]({message.from_user.url})"
     await bot.send_message(env_variables.get("CHANNEL_FEEDBACK_ID"), answer, parse_mode=types.ParseMode.MARKDOWN)

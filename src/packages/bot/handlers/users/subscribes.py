@@ -21,10 +21,11 @@ async def user_subscribe(call: types.CallbackQuery):
         chat_id=env_variables.get("CHANNEL_ID"), user_id=int(call.data.split("|")[1])
     )
     if not chat_member.is_chat_member():
-        await call.message.answer(
+        await call.answer(
             "К сожалению администратор ещё не рассмотрел вашу заявку, пожалуйста, ожидайте. "
             "Обычно рассмотрение не занимает длительное время, возможно, в вашем случае понадобилась "
-            "дополнительная проверка."
+            "дополнительная проверка.",
+            show_alert=True,
         )
     else:
         await call.message.answer(
