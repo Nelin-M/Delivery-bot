@@ -96,6 +96,21 @@ class Log:
         except Exception as exception:
             raise LoggerException(f"Unexpected error: {exception}.") from exception
 
+    def info_from_handlers(
+        self, logger_name: str, tg_id: int, name_func: str, message_from_user: str, text_info=""
+    ) -> None:
+        """
+        Logging a message with the severity of _info_.
+        @param logger_name: the name of the logger that should write the log.
+        @param message: the text of the message that is written to the log.
+        @raise LoggerException: if unexpected error.
+        """
+        self.__check_logger_name_for_existence(logger_name)
+        try:
+            self.info(logger_name, f"tg_id={tg_id},func={name_func}, mess={message_from_user},info={text_info}")
+        except Exception as exception:
+            raise LoggerException(f"Unexpected error: {exception}.") from exception
+
     def debug(self, logger_name: str, message: str) -> None:
         """
         Logging a message with the severity of _debug_.
@@ -106,6 +121,23 @@ class Log:
         self.__check_logger_name_for_existence(logger_name)
         try:
             self._loggers[logger_name].debug(message)
+        except Exception as exception:
+            raise LoggerException(f"Unexpected error: {exception}.") from exception
+
+    def debug_from_handlers(
+        self, logger_name: str, tg_id: int, name_func: str, message_from_user: str, text_info: str
+    ) -> None:
+        """
+        Logging a message with the severity of _debug_.
+        @param logger_name: the name of the logger that should write the log.
+        @param message: the text of the message that is written to the log.
+        @raise LoggerException: if unexpected error.
+        """
+        self.__check_logger_name_for_existence(logger_name)
+        try:
+            self.debug(
+                logger_name, f"Пользователь tg_id={tg_id},func={name_func}, mess={message_from_user},info={text_info}"
+            )
         except Exception as exception:
             raise LoggerException(f"Unexpected error: {exception}.") from exception
 
@@ -122,6 +154,22 @@ class Log:
         except Exception as exception:
             raise LoggerException(f"Unexpected error: {exception}.") from exception
 
+    def warning_from_handlers(
+        self, logger_name: str, tg_id: int, name_func: str, message_from_user: str, text_info: str
+    ) -> None:
+        """
+        Logging a message with the severity of _warning_.
+        @param logger_name: the name of the logger that should write the log.
+        @param message: the text of the message that is written to the log.
+        @raise LoggerException: if unexpected error.
+        """
+        try:
+            self.warning(
+                logger_name, f"Пользователь tg_id={tg_id},func={name_func}, mess={message_from_user},info={text_info} "
+            )
+        except Exception as exception:
+            raise LoggerException(f"Unexpected error: {exception}.") from exception
+
     def error(self, logger_name: str, message: str) -> None:
         """
         Logging a message with the severity of _error_.
@@ -135,6 +183,23 @@ class Log:
         except Exception as exception:
             raise LoggerException(f"Unexpected error: {exception}.") from exception
 
+    def error_from_handlers(
+        self, logger_name: str, tg_id: int, name_func: str, message_from_user: str, text_info: str
+    ) -> None:
+        """
+        Logging a message with the severity of _error_.
+        @param logger_name: the name of the logger that should write the log.
+        @param message: the text of the message that is written to the log.
+        @raise LoggerException: if unexpected error.
+        """
+        self.__check_logger_name_for_existence(logger_name)
+        try:
+            self.error(
+                logger_name, f"Пользователь tg_id={tg_id},func={name_func}, mess={message_from_user},info={text_info}"
+            )
+        except Exception as exception:
+            raise LoggerException(f"Unexpected error: {exception}.") from exception
+
     def critical(self, logger_name: str, message: str) -> None:
         """
         Logging a message with the severity of _critical_.
@@ -145,5 +210,22 @@ class Log:
         self.__check_logger_name_for_existence(logger_name)
         try:
             self._loggers[logger_name].critical(message)
+        except Exception as exception:
+            raise LoggerException(f"Unexpected error: {exception}.") from exception
+
+    def critical_from_handlers(
+        self, logger_name: str, tg_id: int, name_func: str, message_from_user: str, text_info: str
+    ) -> None:
+        """
+        Logging a message with the severity of _critical_.
+        @param logger_name: the name of the logger that should write the log.
+        @param message: the text of the message that is written to the log.
+        @raise LoggerException: if unexpected error.
+        """
+        self.__check_logger_name_for_existence(logger_name)
+        try:
+            self.critical(
+                logger_name, f"Пользователь tg_id={tg_id},func={name_func}, mess={message_from_user},info={text_info}"
+            )
         except Exception as exception:
             raise LoggerException(f"Unexpected error: {exception}.") from exception

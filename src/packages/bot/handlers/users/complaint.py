@@ -1,6 +1,8 @@
 """
 Setting up commands for complaint
 """
+import inspect
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
@@ -9,6 +11,7 @@ from src.packages.bot.keyboards import buttons
 from src.packages.bot.loader import dispatcher, bot
 from src.packages.bot.states import CreateComplaint
 from src.packages.loaders import env_variables
+from src.packages.logger import logger, Loggers
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember(), text="Пожаловаться")
@@ -16,6 +19,10 @@ async def write_complaint(message: types.Message):
     """
     Reaction to the text in inline button "Пожаловаться" and running the state machine
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
     await message.answer(
         "Если сотрудник, повёл себя оскорбительно или у вас возник конфликт, опишите, пожалуйста, ситуацию."
         " Информация будет рассмотрена нашими модераторами и мы примем меры, при описание, укажите: номер машины"
@@ -30,6 +37,10 @@ async def send_complaint_in_group(message: types.Message, state: FSMContext):
     """
     Shutting down the state machine and sending a message to the complaint chat
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
     if message.text == "Отмена":
         await message.answer(text="Вы в главном меню", reply_markup=buttons.main_menu_authorised)
         return await state.finish()
@@ -40,5 +51,6 @@ async def send_complaint_in_group(message: types.Message, state: FSMContext):
         "Обработка жалобы займет некоторое время. "
         f"Она будет опубликована \nв канале [{group_parameters.title}]({group_parameters.invite_link})",
         parse_mode=types.ParseMode.MARKDOWN,
+        reply_markup=buttons.main_menu_authorised,
     )
     await state.finish()

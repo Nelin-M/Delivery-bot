@@ -1,6 +1,8 @@
 """
 Setting up commands for feedback
 """
+import inspect
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
@@ -9,6 +11,7 @@ from src.packages.bot.keyboards import inline_buttons, buttons
 from src.packages.bot.loader import dispatcher, bot
 from src.packages.bot.states import CreateReview
 from src.packages.loaders import env_variables
+from src.packages.logger import logger, Loggers
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember(), text="Обратная связь")
@@ -16,6 +19,10 @@ async def user_start(message: types.Message):
     """
     Reaction to the text /Обратная связь
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
     await message.answer(
         "Вы можете посмотреть или оставить отзыв о работе нашего сервиса!",
         reply_markup=inline_buttons.feedback_keyboard,
@@ -27,6 +34,10 @@ async def write_review(call: types.CallbackQuery):
     """
     Reaction to the text in inline button "Оставить отзыв" and running the state machine
     """
+    tg_user_id = dict(call).get("from").get("id")
+    message_from_user = dict(call).get("data")
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
     await call.message.answer(
         "Ваш отзыв будет опубликован в группе, ждем предложений и пожеланий:", reply_markup=buttons.car_edit_cancel
     )
@@ -38,6 +49,10 @@ async def send_review_in_group(message: types.Message, state: FSMContext):
     """
     Shutting down the state machine and sending a message to the feedback chat
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
     if message.text == "Отмена":
         await message.answer(text="Вы в главном меню", reply_markup=buttons.main_menu_authorised)
         return await state.finish()

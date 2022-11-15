@@ -1,13 +1,15 @@
 """
 Creating a filter
 """
+import inspect
 
 from aiogram import types
 from aiogram.dispatcher.filters import BoundFilter
 
 from src.packages.bot.loader import bot
 from src.packages.loaders import env_variables
-from src.packages.database import UserTable, CarTable
+from src.packages.database import UserTable, CarTable, DatabaseException, TelegramProfileTable
+from src.packages.logger import logger, Loggers
 
 
 class ChatWithABot(BoundFilter):
@@ -80,7 +82,25 @@ class HasCar(BoundFilter):
         @param message:
         @return:
         """
+        tg_user_id = message.from_user.id
+        message_from_user = message.text
+        name_func = inspect.getframeinfo(inspect.currentframe()).function
+        logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
+        try:
+            user = await UserTable.get_by_telegram_id(message.from_user.id)
+        except DatabaseException:
+            user = await UserTable.add(tg_id=message.from_user.id, car_id=None)
+            await TelegramProfileTable.add(
+                tg_id=message.from_user.id, user_id=user.id, nickname=message.from_user.username
+            )
+            logger.error(
+                Loggers.APP.value,
+                tg_user_id,
+                name_func,
+                message_from_user,
+                "(Использование фильтра HasCar для незарегистрированного пользователя )",
+            )
+            logger.info(Loggers.APP.value, tg_user_id, name_func, message_from_user, "Пользователь добавлен в базу")
 
-        user = await UserTable.get_by_telegram_id(message.from_user.id)
         car = await CarTable.get_by_user_id(user.id)
         return bool(car)

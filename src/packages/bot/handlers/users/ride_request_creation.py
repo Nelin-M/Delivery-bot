@@ -1,6 +1,7 @@
 """
 This module for creating ride request
 """
+import inspect
 import re
 from datetime import datetime, date, time
 
@@ -17,6 +18,7 @@ from src.packages.bot.loader import dispatcher, bot
 from src.packages.bot.states import CreateRideRequest
 from src.packages.database import UserTable, RideRequestTable, CarTable
 from src.packages.loaders import env_variables
+from src.packages.logger import logger, Loggers
 
 channel_id = env_variables.get("CHANNEL_ID")
 channel_link = env_variables.get("CHANNEL_LINK")
@@ -104,6 +106,10 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
     current_state = await state.get_state()
     if current_state is None:
         return
@@ -117,6 +123,16 @@ async def choice_date(message: types.Message):
     This function transition to the state create ride request and choice ride data
     @param message: Message object
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(
+        Loggers.INCOMING.value,
+        tg_user_id,
+        name_func,
+        message_from_user,
+        "Старт создания заявки(у пользователя есть авто)",
+    )
     await CreateRideRequest.date.set()
     await message.answer(
         "Выберите дату " + emoji.emojize(":calendar:") + " Или напишите дату в формате XX.XX",
@@ -130,6 +146,16 @@ async def not_car(message: types.Message):
     This function shows message use without car
     @param message: Message object
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(
+        Loggers.INCOMING.value,
+        tg_user_id,
+        name_func,
+        message_from_user,
+        "Старт создания заявки(у пользователя нет авто)",
+    )
     await message.answer(
         "Для создания заявки необходимо добавить машину в разделе \n«Мой автомобиль»\n\n" "Нажмите на кнопку ниже",
         reply_markup=buttons.keyboard_main_profile,
@@ -143,7 +169,10 @@ async def process_date(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
-
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Выбор даты")
     if validation_date(message.text):
         async with state.proxy() as data:
             data["date_ride"] = handler_date(message.text)
@@ -154,6 +183,13 @@ async def process_date(message: types.Message, state: FSMContext):
         )
     else:
         await message.reply("Вы указали дату в неверном формате!")
+        logger.warning_from_handlers(
+            Loggers.INCOMING.value,
+            tg_user_id,
+            name_func,
+            message_from_user,
+            "Пользователь указал дату в неверном формате",
+        )
         await message.answer(
             "Выберите дату " + emoji.emojize(":calendar:") + " Или напишите дату в формате XX.XX",
             reply_markup=buttons.date_keyboard,
@@ -168,6 +204,10 @@ async def process_time(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Выбор времени")
     if validation_time(message.text):
         async with state.proxy() as data:
             data["time_ride"] = handler_time(message.text)
@@ -178,6 +218,13 @@ async def process_time(message: types.Message, state: FSMContext):
         )
     else:
         await message.reply("Вы указали время в неверном формате!\n")
+        logger.warning_from_handlers(
+            Loggers.INCOMING.value,
+            tg_user_id,
+            name_func,
+            message_from_user,
+            "Пользователь указал время в неверном формате",
+        )
         await message.answer(
             "Выберите время из предложенных или укажите время в формате XX:XX.\n" + "Например 07:15",
             reply_markup=buttons.time_keyboard,
@@ -192,6 +239,10 @@ async def process_terms_delivery(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Выбор условий довоза")
     async with state.proxy() as data:
         data["delivery_terms"] = message.text
     await CreateRideRequest.next()
@@ -207,6 +258,12 @@ async def process_place_departure(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(
+        Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Выбор места отправления"
+    )
     async with state.proxy() as data:
         data["departure_place"] = message.text
     await CreateRideRequest.next()
@@ -220,6 +277,10 @@ async def process_place_comming(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Выбор места прибытия")
     async with state.proxy() as data:
         data["destination_place"] = message.text
     await CreateRideRequest.next()
@@ -233,6 +294,10 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Выбор кол-во мест")
     if validation_number_seats(message.text):
         async with state.proxy() as data:
             data["seats_number"] = int(message.text)
@@ -276,6 +341,13 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
         )
     else:
         await message.reply("Вы указали количество мест в неверном формате!\n")
+        logger.warning_from_handlers(
+            Loggers.INCOMING.value,
+            tg_user_id,
+            name_func,
+            message_from_user,
+            "Пользователь указал кол-во мест в неверном формате",
+        )
         await message.answer("Выберите количество мест:", reply_markup=buttons.number_of_seats_keyboard)
         await CreateRideRequest.number_of_seats.set()
 
@@ -287,6 +359,10 @@ async def process_driver(message: types.Message, state: FSMContext):
     @param message: Message object
     @param state: FSMContext object
     """
+    tg_user_id = message.from_user.id
+    message_from_user = message.text
+    name_func = inspect.getframeinfo(inspect.currentframe()).function
+    logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
     if message.text == "Отправить":
         async with state.proxy() as data:
             user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
@@ -294,13 +370,15 @@ async def process_driver(message: types.Message, state: FSMContext):
         data = await state.get_data()
         car = await CarTable.get_by_user_id(user_from_db.id)
         await state.finish()
+        logger.info_from_handlers(
+            Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, f"Заявка создана{data}"
+        )
         await bot.send_message(
             message.chat.id,
             md.text(
                 md.text("Заявка создана"),
                 md.text(
-                    f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Водитель: ")}[{message.from_user.first_name}]({message.from_user.url}) '  # pylint: disable=line-too-long
-                    f'{message.from_user.last_name if message.from_user.last_name is not None else ""} '
+                    f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Водитель: ")}[{message.from_user.first_name} {message.from_user.last_name if message.from_user.last_name is not None else ""}]({message.from_user.url}) '  # pylint: disable=line-too-long
                 ),
                 md.text(
                     f'{emoji.emojize(":oncoming_automobile:")}{md.bold(" Машина: ")}'
@@ -335,21 +413,21 @@ async def process_driver(message: types.Message, state: FSMContext):
         await bot.send_message(
             message.chat.id,
             md.text(
-                f"Данную заявку вы сможете найти в нижнем меню -> «Мои заявки» и [в канале с заявками]({channel_link})"
+                f"Данную заявку вы сможете найти в нижнем меню -> «Мои заявки» и [в канале с заявками]({channel_link})\n"  # pylint: disable=line-too-long
+                f"\nТвои пассажиры отметятся в комментариях под заявкой"
             ),
             parse_mode=ParseMode.MARKDOWN,
-        )  # pylint: disable=line-too-long
+        )
         post_in_channel = await bot.send_message(
             channel_id,
             md.text(
                 md.text("#водитель\n"),
                 md.text(
-                    f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Водитель: ")}[{message.from_user.first_name}]({message.from_user.url}) '  # pylint: disable=line-too-long
-                    f'{message.from_user.last_name if message.from_user.last_name is not None else ""} '
+                    f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Водитель: ")}[{message.from_user.first_name} {message.from_user.last_name if message.from_user.last_name is not None else ""}]({message.from_user.url}) '  # pylint: disable=line-too-long
                 ),
                 md.text(
-                    f'{emoji.emojize(":oncoming_automobile:")}{md.bold(" Машина: ")}{car.brand} {car.model} ({car.number_plate[:6]} {car.number_plate[6:]})'
-                ),  # pylint: disable=line-too-long
+                    f'{emoji.emojize(":oncoming_automobile:")}{md.bold(" Машина: ")}{car.brand} {car.model} ({car.number_plate[:6]} {car.number_plate[6:]})'  # pylint: disable=line-too-long
+                ),
                 md.text(
                     f'{emoji.emojize(":calendar:")}{md.bold(" Дата и время: ")}'
                     f'{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'
