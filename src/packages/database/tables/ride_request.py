@@ -62,6 +62,8 @@ class RideRequestTable:
         @return: RideRequest
         """
         ride_request = await RideRequest.query.where(RideRequest.id == ride_request_id).gino.first()
+        if ride_request is None:
+            raise DatabaseException("Заявка не найдена в базе данных")
         return ride_request
 
     @staticmethod

@@ -35,6 +35,8 @@ class UserTable:
         @return: User
         """
         user = await User.query.where(User.id == user_id).gino.first()
+        if user is None:
+            raise DatabaseException("Пользователь не найден в базе данных")
         return user
 
     @staticmethod
@@ -44,7 +46,10 @@ class UserTable:
         @param tg_id: telegram id
         @return: User
         """
+
         user = await User.query.where(User.tg_id == tg_id).gino.first()
+        if user is None:
+            raise DatabaseException("Пользователь не найден в базе данных")
         return user
 
     # pylint: disable=W0622,C0103:
