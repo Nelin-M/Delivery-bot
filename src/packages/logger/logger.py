@@ -102,12 +102,15 @@ class Log:
         """
         Logging a message with the severity of _info_.
         @param logger_name: the name of the logger that should write the log.
-        @param message: the text of the message that is written to the log.
+        @param tg_id: user_id from telegram.
+        @param name_func: the name of the function we are logging.
+        @param message_from_user: message written by the user.
+        @param text_info: information for developers.
         @raise LoggerException: if unexpected error.
         """
         self.__check_logger_name_for_existence(logger_name)
         try:
-            self.info(logger_name, f"tg_id={tg_id},func={name_func}, mess={message_from_user},info={text_info}")
+            self.info(logger_name, f"tg_id={tg_id}, func={name_func}, mess={message_from_user}, info={text_info}")
         except Exception as exception:
             raise LoggerException(f"Unexpected error: {exception}.") from exception
 
@@ -130,14 +133,15 @@ class Log:
         """
         Logging a message with the severity of _debug_.
         @param logger_name: the name of the logger that should write the log.
-        @param message: the text of the message that is written to the log.
+        @param tg_id: user_id from telegram.
+        @param name_func: the name of the function we are logging.
+        @param message_from_user: message written by the user.
+        @param text_info: information for developers.
         @raise LoggerException: if unexpected error.
         """
         self.__check_logger_name_for_existence(logger_name)
         try:
-            self.debug(
-                logger_name, f"Пользователь tg_id={tg_id},func={name_func}, mess={message_from_user},info={text_info}"
-            )
+            self.debug(logger_name, f"tg_id={tg_id}, func={name_func}, mess={message_from_user}, info={text_info}")
         except Exception as exception:
             raise LoggerException(f"Unexpected error: {exception}.") from exception
 
@@ -160,13 +164,14 @@ class Log:
         """
         Logging a message with the severity of _warning_.
         @param logger_name: the name of the logger that should write the log.
-        @param message: the text of the message that is written to the log.
+        @param tg_id: user_id from telegram.
+        @param name_func: the name of the function we are logging.
+        @param message_from_user: message written by the user.
+        @param text_info: information for developers.
         @raise LoggerException: if unexpected error.
         """
         try:
-            self.warning(
-                logger_name, f"Пользователь tg_id={tg_id},func={name_func}, mess={message_from_user},info={text_info} "
-            )
+            self.warning(logger_name, f"tg_id={tg_id}, func={name_func}, mess={message_from_user}, info={text_info} ")
         except Exception as exception:
             raise LoggerException(f"Unexpected error: {exception}.") from exception
 
@@ -189,14 +194,15 @@ class Log:
         """
         Logging a message with the severity of _error_.
         @param logger_name: the name of the logger that should write the log.
-        @param message: the text of the message that is written to the log.
+        @param tg_id: user_id from telegram.
+        @param name_func: the name of the function we are logging.
+        @param message_from_user: message written by the user.
+        @param text_info: information for developers.
         @raise LoggerException: if unexpected error.
         """
         self.__check_logger_name_for_existence(logger_name)
         try:
-            self.error(
-                logger_name, f"Пользователь tg_id={tg_id},func={name_func}, mess={message_from_user},info={text_info}"
-            )
+            self.error(logger_name, f"tg_id={tg_id}, func={name_func}, mess={message_from_user}, info={text_info}")
         except Exception as exception:
             raise LoggerException(f"Unexpected error: {exception}.") from exception
 
@@ -219,13 +225,14 @@ class Log:
         """
         Logging a message with the severity of _critical_.
         @param logger_name: the name of the logger that should write the log.
-        @param message: the text of the message that is written to the log.
+        @param tg_id: user_id from telegram.
+        @param name_func: the name of the function we are logging.
+        @param message_from_user: message written by the user.
+        @param text_info: information for developers.
         @raise LoggerException: if unexpected error.
         """
         self.__check_logger_name_for_existence(logger_name)
         try:
-            self.critical(
-                logger_name, f"Пользователь tg_id={tg_id},func={name_func}, mess={message_from_user},info={text_info}"
-            )
+            self.critical(logger_name, f"tg_id={tg_id}, func={name_func}, mess={message_from_user}, info={text_info}")
         except Exception as exception:
             raise LoggerException(f"Unexpected error: {exception}.") from exception
