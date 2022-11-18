@@ -243,7 +243,9 @@ async def process_time(message: types.Message, state: FSMContext):
                 data["time_ride"] = handler_time(message.text)
             await CreateRideRequest.next()
             await message.answer(
-                "Введите условие довоза\nНапример: «за шоколадку»\nИли нажмите «дальше»",
+                "Здесь вы можете указать полные условия довоза, не только что вы хотите "
+                "получить от пассажира, но и дополнительные условия, по типу "
+                "«не беру курящих» или нажмите «Пропустить»",
                 reply_markup=buttons.keyboard_terms_delivery,
             )
         else:
@@ -387,7 +389,7 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
                     ),
                     md.text(
                         f"{md.bold('Условия довоза: ')}\n"
-                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
+                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Пропустить' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
                     ),
                     md.text(
                         f'{md.bold("🅰 Место отправления:")}\n{data["departure_place"] if data.get("departure_place") is not None else ""}'  # pylint: disable=line-too-long
@@ -464,7 +466,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                     ),
                     md.text(
                         f"{md.bold('Условия довоза: ')}\n"
-                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
+                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Пропустить' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
                     ),
                     md.text(
                         f"{md.bold('🅰 Место отправления:')}\n{data['departure_place'] if data.get('departure_place') is not None else ''}"  # pylint: disable=line-too-long
@@ -484,7 +486,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                 message.chat.id,
                 md.text(
                     f"Данную заявку вы сможете найти в нижнем меню -> «Мои заявки» и [в канале с заявками]({channel_link})\n"  # pylint: disable=line-too-long
-                    f"\nТвои пассажиры отметятся в комментариях под заявкой"
+                    f"\n❗ Внимательно следите за своей заявкой. Твои пассажиры отметятся в комментариях под ней"
                 ),
                 parse_mode=ParseMode.MARKDOWN,
             )
@@ -508,7 +510,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                     ),
                     md.text(
                         f"{md.bold('Условия довоза: ')}\n"
-                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
+                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Пропустить' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
                     ),
                     md.text(
                         f"{md.bold('🅰 Место отправления:')}\n{data['departure_place'] if data.get('departure_place') is not None else ''}"  # pylint: disable=line-too-long

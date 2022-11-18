@@ -34,7 +34,7 @@ async def car_info_car_added(message: types.Message):
                 tg_user_id,
                 name_func,
                 message_from_user,
-                "пользователь (тсутствует в базе),нажал кнопку <<Мой автомобиль>>",
+                "пользователь (тсутствует в базе),нажал кнопку «Мой автомобиль>>",
             )
 
             user = await UserTable.add(tg_id=message.from_user.id, car_id=None)
@@ -310,7 +310,7 @@ async def create_result_handling(message: types.Message, state: FSMContext):
             # pylint: disable=R0801
             except DatabaseException as error:
                 await message.answer(text=str(error))
-                logger.error(
+                logger.error_from_handlers(
                     Loggers.APP.value,
                     tg_user_id,
                     name_func,
@@ -385,7 +385,7 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
             # pylint: disable=R0801
             except DatabaseException as error:
                 await message.answer(text=str(error))
-                logger.error(
+                logger.error_from_handlers(
                     Loggers.APP.value,
                     tg_user_id,
                     name_func,

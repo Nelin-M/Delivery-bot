@@ -31,9 +31,10 @@ async def not_signed(message: types.Message):
             ],
         )
         await message.answer(
-            f"{message.from_user.first_name}, вы не подписаны на группу с заявками. Для использования бота, "
-            f"вам необходимо отправить заявку на вступление в группу и "
-            f"дождаться пока администратор одобрит вашу заявку",
+            f"{message.from_user.first_name},вы не подписаны на группу с заявками. "
+            f"Для использования бота,вам необходимо отправить заявку на вступление "
+            f"в группу и дождаться пока администратор одобрит вашу заявку. "
+            f"Чтобы проверить статус заявки, нажмите «Проверить подписку»",
             reply_markup=subscribe,
         )
     except Exception as ex:
@@ -49,4 +50,4 @@ async def error(message: types.Message):
     """
     If you receive messages that are not processed
     """
-    await message.answer("Я работаю только со встроенными командами")
+    await message.answer("Такой команды нет, выберите команду из /menu или нажмите /start")

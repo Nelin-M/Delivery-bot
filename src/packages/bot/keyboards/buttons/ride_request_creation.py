@@ -46,7 +46,7 @@ keyboard_main_profile = ReplyKeyboardMarkup(
 )
 keyboard_terms_delivery = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton("Дальше")],
+        [KeyboardButton("Пропустить")],
         [KeyboardButton("За шоколадку " + emoji.emojize(":chocolate_bar:"))],
         [KeyboardButton("Отмена")],
     ],

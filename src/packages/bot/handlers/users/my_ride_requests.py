@@ -60,7 +60,7 @@ async def my_ride_requests_start(message: types.Message):
                         ),
                         md.text(
                             f"{md.bold('Условия довоза: ')}"
-                            f"{ride_request.delivery_terms if ride_request.delivery_terms != 'Дальше' and ride_request.delivery_terms is not None else 'Не указано'}"  # pylint: disable=line-too-long
+                            f"{ride_request.delivery_terms if ride_request.delivery_terms != 'Пропустить' and ride_request.delivery_terms is not None else 'Не указано'}"  # pylint: disable=line-too-long
                         ),
                         md.text(
                             f'{md.bold("Место отправления: ")}{"" if ride_request.departure_place is None else ride_request.departure_place}'  # pylint: disable=line-too-long
