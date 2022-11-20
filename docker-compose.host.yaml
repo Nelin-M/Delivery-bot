@@ -1,10 +1,11 @@
 version: "3.9"
 services:
-  app:
-    build: .
-    restart: always
-    volumes:
-      - ./logs:/usr/src/app/logs
+#  todo: почему то контейнер с приложением не видит postgres
+#  app:
+#    build: .
+#    restart: always
+#    volumes:
+#      - ./logs:/usr/src/app/logs
 
   postgres:
     image: postgres:13.3
