@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "Delivery-bot"
-version = "0.0.1"
-description = ""
+version = "1.0.0"
+description = "Bot for organizing the delivery of Sberbank employees"
 authors = ["Maxim Nelin <nelin.max0@gmail.com>"]
 
 [tool.poetry.scripts]
