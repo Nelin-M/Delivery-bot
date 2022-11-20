@@ -46,9 +46,10 @@ class ThrottlingMiddleware(BaseMiddleware):
         message_throttled
         """
 
+        # todo: refactor + текста
         delta = throttled.rate - throttled.delta
         if throttled.exceeded_count == 3:
-            await message.reply("Ты отправляешь команды слишком часто!!!")
+            await message.reply("Вы отправляете слишком много сообщений, подождите несколько секунд.")
         elif throttled.exceeded_count == 4:
-            await message.reply("Отвечу тебе через 10 секунд!")
+            await message.reply("Вы отправляете слишком много сообщений, подождите около 10 секунд.")
         await asyncio.sleep(delta)
