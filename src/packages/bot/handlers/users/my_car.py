@@ -34,7 +34,7 @@ async def car_info_car_added(message: types.Message):
                 tg_user_id,
                 name_func,
                 message_from_user,
-                "пользователь (тсутствует в базе),нажал кнопку <<Мой автомобиль>>",
+                'пользователь отсутствует в базе, нажал кнопку "Мой автомобиль"',
             )
 
             user = await UserTable.add(tg_id=message.from_user.id, car_id=None)
@@ -260,7 +260,7 @@ async def edit_confirmation(message: types.Message, state: FSMContext):
         elif match is None:
             await message.answer(
                 text="Гос. номер введен неверно, повторите ввод, в формате: серия, номер, серия, "
-                "код региона (A000AA123)"
+                "код региона (A000AA123). "
             )
             logger.info_from_handlers(
                 Loggers.APP.value, tg_user_id, name_func, message_from_user, "неверно ввел номер машины"
