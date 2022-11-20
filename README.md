@@ -102,7 +102,7 @@ Starting all containers:
 
 Postgres database deployed with options specified in `.env` on port `5432`.
 
-Database management systems adminer deployed on port `8080` and is available at [this link](http://localhost:8080/).
+Database management systems adminer deployed on port `8080` and is available at [this link](http://localhost:8080/) (for connection by ssh try [this link](http://0.0.0.0:8080)).
 
 In order to enter the database, you need to specify parameters similar to the parameters from `.env`, in the _"Server"_ field you need to specify `postgres:5432`.
 
