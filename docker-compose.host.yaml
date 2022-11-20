@@ -1,0 +1,41 @@
+version: "3.9"
+services:
+#  todo: почему то контейнер с приложением не видит postgres
+#  app:
+#    build: .
+#    restart: always
+#    volumes:
+#      - ./logs:/usr/src/app/logs
+
+  postgres:
+    image: postgres:13.3
+    volumes:
+      - ../2. Init Database:/docker-entrypoint-initdb.d
+      - .:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 4G
+    environment:
+      POSTGRES_HOST: "127.0.0.1"
+      POSTGRES_DB: "db"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "pass"
+      PGDATA: "/var/lib/postgresql/data/pgdata_bot/"
+
+  adminer:
+    container_name: "adminer"
+    image: adminer:latest
+    restart: always
+    ports:
+      - "8080:8080"

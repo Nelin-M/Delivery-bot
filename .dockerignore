@@ -1,0 +1,14 @@
+.idea
+.venv
+docs
+notebooks
+pgdata
+.cz.toml
+.env.dist
+.gitignore
+.pre-commit-config.yaml
+.pylintrc
+src/Delivery-bot.log
+docker-compose.yaml
+Dockerfile
+*.md

@@ -4,7 +4,7 @@ This module is responsible for loading the configuration file for the bot and lo
 import json
 from typing import Dict, Optional, Union
 from dotenv import dotenv_values, find_dotenv
-from packages.path_storage import PathStorage
+from src.packages.path_storage import PathStorage
 
 __all__ = ["ConfigLoader"]
 

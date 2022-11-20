@@ -1,7 +1,7 @@
 {
   "start_phrase": "Привет!",
   "help_phrase": "Чем могу помочь?",
-  "log_filename": "Delivery-bot.log",
+  "log_filename": "logs/Delivery-bot.log",
   "log_encoding": "utf-8",
   "logging_date_format": "%Y-%m-%d %H:%M",
   "logging_formats": {
