@@ -35,7 +35,7 @@ Install _Microsoft C++ Build Tools_ 14.0 or greater.
 Install dependencies.
 
 ```shell
-> poetry install --no-dev
+> poetry install --only main
 ```
 
 ##### Linux:
@@ -43,7 +43,11 @@ Install dependencies.
 Initialization and launch of the virtual environment with poetry.
 
 ```shell
-$ curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python3.10
+$ curl -sSL https://install.python-poetry.org | python3 -
+
+$ echo "export PATH=$PATH:~/.local/share/pypoetry/venv/bin" >> ~/.bashrc
+
+$ bash
 
 $ poetry env use python3.10
 ```
