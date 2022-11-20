@@ -149,3 +149,4 @@ catboost_info/
 
 # Database files
 /pgdata
+/pgdata_bot
