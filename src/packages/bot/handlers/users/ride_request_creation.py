@@ -491,7 +491,11 @@ async def process_driver(message: types.Message, state: FSMContext):
             post_in_channel = await bot.send_message(
                 channel_id,
                 md.text(
-                    md.text("#водитель\n"),
+                    md.text(
+                        f"#водитель #дата\\_{refactor_str(data['date_ride'].day if data.get('date_ride') is not None else '')}"  # pylint: disable=line-too-long
+                        f"\\_{refactor_str(data['date_ride'].month if data.get('date_ride') is not None else '')}\\_{data['date_ride'].year if data.get('date_ride') is not None else ''} #время\\_{refactor_str(data['time_ride'].hour if data.get('time_ride') is not None else '')}"  # pylint: disable=line-too-long
+                        f"\\_{refactor_str(data['time_ride'].minute if data.get('time_ride') is not None else '')}\n"
+                    ),  # pylint: disable=line-too-long
                     md.text(
                         f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Водитель: ")}[{message.from_user.first_name} {message.from_user.last_name if message.from_user.last_name is not None else ""}]({message.from_user.url}) '  # pylint: disable=line-too-long
                     ),
