@@ -49,7 +49,7 @@ async def my_ride_requests_start(message: types.Message):
                     message.chat.id,
                     md.text(
                         md.text(
-                            f'{md.bold("Водитель: ")}'
+                            f'{md.bold("Водитель/Автор заявки: ")}'
                             f'{message.from_user.first_name if message.from_user.first_name is not None else ""} '
                             f'{message.from_user.last_name if message.from_user.last_name is not None else ""} '
                         ),
