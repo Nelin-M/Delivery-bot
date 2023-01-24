@@ -121,6 +121,7 @@ disable=
     consider-using-alias,
     missing-raises-doc,
     arguments-differ,
+    invalid-unary-operand-type,
     # Questionable
     consider-alternative-union-syntax,
     # Failed to fully solve the problem with sys.path
