@@ -91,7 +91,9 @@ To enable pre-commit on the current repository:
 #### Commands
 
 - `poetry run black src/` – launch style checker.
+- `pre-commit run black src/` – launch style checker through pre-commit.
 - `poetry run pylint src/` – launch linter.
+- `pre-commit run pylint src/` – launch linter through pre-commit.
 - `poetry run python -m src.main` – launch app.
 
 ### Docker
