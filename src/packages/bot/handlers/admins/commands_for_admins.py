@@ -12,7 +12,7 @@ from src.packages.bot.other.throttling import rate_limit
 from src.packages.loaders import env_variables
 from src.packages.logger import logger, Loggers
 
-admins = env_variables.get("ADMINS").replace(" ", "").split(",")
+admins = env_variables.get("ADMINS_ID").replace(" ", "").split(",")
 
 
 # Handler is off
