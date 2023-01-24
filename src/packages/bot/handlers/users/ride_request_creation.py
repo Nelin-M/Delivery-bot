@@ -243,7 +243,8 @@ async def process_time(message: types.Message, state: FSMContext):
                 data["time_ride"] = handler_time(message.text)
             await CreateRideRequest.next()
             await message.answer(
-                "Введите условие довоза\nНапример: «за шоколадку»\nИли нажмите «дальше»",
+                "Введите условие довоза\nНапример: «за шоколадку»\nИли нажмите «дальше»"
+                "\nОбратите внимание, любые виды денежной компенсации указывать запрещено",
                 reply_markup=buttons.keyboard_terms_delivery,
             )
         else:

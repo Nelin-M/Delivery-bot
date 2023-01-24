@@ -93,14 +93,16 @@ class HasCar(BoundFilter):
             await TelegramProfileTable.add(
                 tg_id=message.from_user.id, user_id=user.id, nickname=message.from_user.username
             )
-            logger.error(
+            logger.error_from_handlers(
                 Loggers.APP.value,
                 tg_user_id,
                 name_func,
                 message_from_user,
                 "(Использование фильтра HasCar для незарегистрированного пользователя )",
             )
-            logger.info(Loggers.APP.value, tg_user_id, name_func, message_from_user, "Пользователь добавлен в базу")
+            logger.info_from_handlers(
+                Loggers.APP.value, tg_user_id, name_func, message_from_user, "Пользователь добавлен в базу"
+            )
 
         car = await CarTable.get_by_user_id(user.id)
         return bool(car)
