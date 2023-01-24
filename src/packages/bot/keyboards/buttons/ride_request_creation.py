@@ -7,18 +7,16 @@ import emoji
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 
-def handle_date(days):
+def handle_date(days: int):
     """
     This function returns the current date plus days
-    @param days: int
     """
     return datetime.datetime.now() + datetime.timedelta(days)
 
 
-def str_button(days):
+def str_button(days: int):
     """
     This function returns string to create a button
-    @param days: int
     """
     return (
         f"{handle_date(days).day if len(str(handle_date(days).day)) == 2 else '0' + str(handle_date(days).day)}."

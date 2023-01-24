@@ -18,10 +18,9 @@ from src.packages.database import UserTable, RideRequestTable
 from src.packages.logger import logger, Loggers
 
 
-def refactor_str(str_input):
+def refactor_str(str_input: str):
     """
     This function refactor string
-    @param str_input: str
     """
     str_input = str(str_input)
     return f"{str_input if len(str_input) == 2 else '0' + str_input}"
@@ -60,21 +59,20 @@ async def my_ride_requests_start(message: types.Message):
                         ),
                         md.text(
                             f"{md.bold('Условия довоза: ')}"
-                            f"{ride_request.delivery_terms if ride_request.delivery_terms != 'Дальше' and ride_request.delivery_terms is not None else 'Не указано'}"  # pylint: disable=line-too-long
+                            f"{ride_request.delivery_terms if ride_request.delivery_terms != 'Дальше' and ride_request.delivery_terms is not None else 'Не указано'}"
                         ),
                         md.text(
-                            f'{md.bold("Место отправления: ")}{"" if ride_request.departure_place is None else ride_request.departure_place}'  # pylint: disable=line-too-long
+                            f'{md.bold("Место отправления: ")}{"" if ride_request.departure_place is None else ride_request.departure_place}'
                         ),
                         md.text(
-                            f'{md.bold("Место прибытия: ")}{"" if ride_request.destination_place is None else ride_request.destination_place}'  # pylint: disable=line-too-long
+                            f'{md.bold("Место прибытия: ")}{"" if ride_request.destination_place is None else ride_request.destination_place}'
                         ),
                         md.text(
-                            f'{md.bold("Количество мест: ")}{"" if ride_request.seats_number is None else ride_request.seats_number}'  # pylint: disable=line-too-long
+                            f'{md.bold("Количество мест: ")}{"" if ride_request.seats_number is None else ride_request.seats_number}'
                         ),
                         sep="\n",
                     ),
                     parse_mode=ParseMode.MARKDOWN,
-                    # pylint: disable=W0511
                     # TODO: переделать
                     reply_markup=InlineKeyboardMarkup(
                         row_width=2,

@@ -26,7 +26,6 @@ class UserTable:
         except UniqueViolationError as exception:
             raise DatabaseException("Пользователь уже существует в базе данных.") from exception
 
-    # pylint: disable=W0622,C0103:
     @staticmethod
     async def get_by_user_id(user_id: int) -> User:
         """
@@ -52,25 +51,21 @@ class UserTable:
             raise DatabaseException("Пользователь не найден в базе данных")
         return user
 
-    # pylint: disable=W0622,C0103:
     @classmethod
     async def update(cls, user_id: int, data: dict):
         """
         This method updates User object
         @param user_id: User.user_id
         @param data: data to update
-        @return:
         """
         user = await cls.get_by_user_id(user_id)
         await user.update(**data).apply()
 
-    # pylint: disable=W0622,C0103:
     @classmethod
     async def delete(cls, user_id: int):
         """
         This method deletes User object
         @param user_id: User.id
-        @return:
         """
         user = await cls.get_by_user_id(user_id)
         await user.delete()

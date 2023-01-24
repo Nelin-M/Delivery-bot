@@ -9,7 +9,6 @@ from gino import Gino
 db = Gino()
 
 
-# pylint: disable=C0115
 class BaseModel(db.Model):
     """
     The class of Base Model

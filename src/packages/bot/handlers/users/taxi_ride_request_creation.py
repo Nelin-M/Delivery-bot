@@ -26,7 +26,7 @@ channel_link = env_variables.get("CHANNEL_LINK")
 bot_link = env_variables.get("BOT_LINK")
 
 
-def refactor_str(str_input):
+def refactor_str(str_input: str):
     """
     This function refactor string
     @param str_input: str
@@ -35,10 +35,9 @@ def refactor_str(str_input):
     return f"{str_input if len(str_input) == 2 else '0' + str_input}"
 
 
-def handler_date(str_date):
+def handler_date(str_date: str):
     """
     This function refactor str in date
-    @param str_date: str_date
     """
     lst_date = str_date.split(".")
     day = int(lst_date[0])
@@ -47,10 +46,9 @@ def handler_date(str_date):
     return date(year, month, day)
 
 
-def handler_time(str_time):
+def handler_time(str_time: str):
     """
     This function refactor str in time
-    @param str_time: str_time
     """
     lst_time = str_time.split(":")
     hour = int(lst_time[0])
@@ -59,38 +57,31 @@ def handler_time(str_time):
     return time(hour, minute, second)
 
 
-def validation_date(text):
+def validation_date(text: str):
     """
     This function validates the date entered by the user
-    @param text: text
     """
     return (
         re.findall(r"\d\d\.\d\d", f"r'{text}'")
-        and int(text.split(".")[0]) >= 0
-        and int(text.split(".")[0]) <= 31
-        and int(text.split(".")[1]) >= 1
-        and int(text.split(".")[1]) < 12
+        and 0 <= int(text.split(".")[0]) <= 31
+        and 1 <= int(text.split(".")[1]) < 12
     )
 
 
-def validation_time(text):
+def validation_time(text: str):
     """
     This function validates the time entered by the user
-    @param text: text
     """
     return (
         re.findall(r"\d\d:\d\d", f"r'{text}'")
-        and int(text.split(":")[0]) >= 0
-        and int(text.split(":")[0]) < 24
-        and int(text.split(":")[1]) >= 0
-        and int(text.split(":")[1]) < 60
+        and 0 <= int(text.split(":")[0]) < 24
+        and 0 <= int(text.split(":")[1]) < 60
     )
 
 
-def validation_number_seats(text):
+def validation_number_seats(text: str):
     """
     This function validates the number_seats entered by the user
-    @param text: text
     """
     try:
         text = int(text)
@@ -371,25 +362,25 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
                 message.chat.id,
                 md.text(
                     md.text(
-                        f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Автор заявки: ")}{message.from_user.first_name if message.from_user.first_name is not None else ""} {message.from_user.last_name if message.from_user.last_name is not None else ""} '  # pylint: disable=line-too-long
+                        f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Автор заявки: ")}{message.from_user.first_name if message.from_user.first_name is not None else ""} {message.from_user.last_name if message.from_user.last_name is not None else ""} '
                     ),
                     md.text(
-                        f'{emoji.emojize(":calendar:")}{md.bold(" Дата и время: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'  # pylint: disable=line-too-long
-                        f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.{data["date_ride"].year if data.get("date_ride") is not None else ""} в '  # pylint: disable=line-too-long
-                        f'{refactor_str(data["time_ride"].hour if data.get("time_ride") is not None else "")}:{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'  # pylint: disable=line-too-long
+                        f'{emoji.emojize(":calendar:")}{md.bold(" Дата и время: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'
+                        f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.{data["date_ride"].year if data.get("date_ride") is not None else ""} в '
+                        f'{refactor_str(data["time_ride"].hour if data.get("time_ride") is not None else "")}:{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'
                     ),
                     md.text(
                         f"{md.bold('Условия довоза: ')}\n"
-                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
+                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"
                     ),
                     md.text(
-                        f'{md.bold("🅰 Место отправления:")}\n{data["departure_place"] if data.get("departure_place") is not None else ""}'  # pylint: disable=line-too-long
+                        f'{md.bold("🅰 Место отправления:")}\n{data["departure_place"] if data.get("departure_place") is not None else ""}'
                     ),
                     md.text(
-                        f'{md.bold("🅱 Место прибытия:")}\n{data["destination_place"] if data.get("destination_place") is not None else ""}'  # pylint: disable=line-too-long
+                        f'{md.bold("🅱 Место прибытия:")}\n{data["destination_place"] if data.get("destination_place") is not None else ""}'
                     ),
                     md.text(
-                        f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'  # pylint: disable=line-too-long
+                        f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
                     ),
                     sep="\n",
                 ),
@@ -447,53 +438,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                 md.text(
                     md.text("Заявка создана"),
                     md.text(
-                        f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Автор заявки: ")}[{message.from_user.first_name} {message.from_user.last_name if message.from_user.last_name is not None else ""}]({message.from_user.url}) '  # pylint: disable=line-too-long
-                    ),
-                    md.text(
-                        f'{emoji.emojize(":calendar:")}{md.bold(" Дата и время: ")}'
-                        f'{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'
-                        f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.'
-                        f'{data["date_ride"].year if data.get("date_ride") is not None else ""} в '
-                        f'{refactor_str(data["time_ride"].hour if data.get("time_ride") is not None else "")}:'
-                        f'{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'
-                    ),
-                    md.text(
-                        f"{md.bold('Условия довоза: ')}\n"
-                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"  # pylint: disable=line-too-long
-                    ),
-                    md.text(
-                        f"{md.bold('🅰 Место отправления:')}\n{data['departure_place'] if data.get('departure_place') is not None else ''}"  # pylint: disable=line-too-long
-                    ),
-                    md.text(
-                        f'{md.bold("🅱 Место прибытия: ")}\n{data["destination_place"] if data.get("destination_place") is not None else ""}'  # pylint: disable=line-too-long
-                    ),
-                    md.text(
-                        f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'  # pylint: disable=line-too-long
-                    ),
-                    sep="\n",
-                ),
-                reply_markup=buttons.main_menu_authorised,
-                parse_mode=ParseMode.MARKDOWN,
-            )
-            await bot.send_message(
-                message.chat.id,
-                md.text(
-                    f"Данную заявку вы сможете найти в нижнем меню -> «Мои заявки» и [в канале с заявками]({channel_link})\n"  # pylint: disable=line-too-long
-                    f"\nТвои пассажиры отметятся в комментариях под заявкой"
-                ),
-                parse_mode=ParseMode.MARKDOWN,
-            )
-            post_in_channel = await bot.send_message(
-                channel_id,
-                md.text(
-                    md.text(
-                        f"🚖#набор\\_в\\_такси\\_{refactor_str(data['date_ride'].day if data.get('date_ride') is not None else '')}"  # pylint: disable=line-too-long
-                        f"\\_{refactor_str(data['date_ride'].month if data.get('date_ride') is not None else '')}\\_{data['date_ride'].year if data.get('date_ride') is not None else ''} #время\\_{refactor_str(data['time_ride'].hour if data.get('time_ride') is not None else '')}"  # pylint: disable=line-too-long
-                        f"\\_{refactor_str(data['time_ride'].minute if data.get('time_ride') is not None else '')}\n"
-                    ),  # pylint: disable=line-too-long
-                    md.text(
-                        f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Автор поездки: ")}[{message.from_user.first_name} {message.from_user.last_name if message.from_user.last_name is not None else ""}]({message.from_user.url}) '
-                        # pylint: disable=line-too-long
+                        f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Автор заявки: ")}[{message.from_user.first_name} {message.from_user.last_name if message.from_user.last_name is not None else ""}]({message.from_user.url}) '
                     ),
                     md.text(
                         f'{emoji.emojize(":calendar:")}{md.bold(" Дата и время: ")}'
@@ -506,19 +451,60 @@ async def process_driver(message: types.Message, state: FSMContext):
                     md.text(
                         f"{md.bold('Условия довоза: ')}\n"
                         f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"
-                        # pylint: disable=line-too-long
                     ),
                     md.text(
                         f"{md.bold('🅰 Место отправления:')}\n{data['departure_place'] if data.get('departure_place') is not None else ''}"
-                        # pylint: disable=line-too-long
                     ),
                     md.text(
                         f'{md.bold("🅱 Место прибытия: ")}\n{data["destination_place"] if data.get("destination_place") is not None else ""}'
-                        # pylint: disable=line-too-long
                     ),
                     md.text(
                         f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
-                        # pylint: disable=line-too-long
+                    ),
+                    sep="\n",
+                ),
+                reply_markup=buttons.main_menu_authorised,
+                parse_mode=ParseMode.MARKDOWN,
+            )
+            await bot.send_message(
+                message.chat.id,
+                md.text(
+                    f"Данную заявку вы сможете найти в нижнем меню -> «Мои заявки» и [в канале с заявками]({channel_link})\n"
+                    f"\nТвои пассажиры отметятся в комментариях под заявкой"
+                ),
+                parse_mode=ParseMode.MARKDOWN,
+            )
+            post_in_channel = await bot.send_message(
+                channel_id,
+                md.text(
+                    md.text(
+                        f"🚖#набор\\_в\\_такси\\_{refactor_str(data['date_ride'].day if data.get('date_ride') is not None else '')}"
+                        f"\\_{refactor_str(data['date_ride'].month if data.get('date_ride') is not None else '')}\\_{data['date_ride'].year if data.get('date_ride') is not None else ''} #время\\_{refactor_str(data['time_ride'].hour if data.get('time_ride') is not None else '')}"
+                        f"\\_{refactor_str(data['time_ride'].minute if data.get('time_ride') is not None else '')}\n"
+                    ),
+                    md.text(
+                        f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Автор поездки: ")}[{message.from_user.first_name} {message.from_user.last_name if message.from_user.last_name is not None else ""}]({message.from_user.url}) '
+                    ),
+                    md.text(
+                        f'{emoji.emojize(":calendar:")}{md.bold(" Дата и время: ")}'
+                        f'{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'
+                        f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.'
+                        f'{data["date_ride"].year if data.get("date_ride") is not None else ""} в '
+                        f'{refactor_str(data["time_ride"].hour if data.get("time_ride") is not None else "")}:'
+                        f'{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'
+                    ),
+                    md.text(
+                        f"{md.bold('Условия довоза: ')}\n"
+                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"
+                    ),
+                    md.text(
+                        f"{md.bold('🅰 Место отправления:')}\n{data['departure_place'] if data.get('departure_place') is not None else ''}"
+                    ),
+                    md.text(
+                        f'{md.bold("🅱 Место прибытия: ")}\n{data["destination_place"] if data.get("destination_place") is not None else ""}'
+                    ),
+                    md.text(
+                        f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
                     ),
                     md.text(f"\nОтправить свою заявку вы можете при помощи бота: {bot_link}"),
                     sep="\n",

@@ -273,7 +273,7 @@ async def edit_confirmation(message: types.Message, state: FSMContext):
         logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: edit_confirmation")
 
 
-@dispatcher.message_handler(~HasCar(), state=EditCarFSM.result_handling)
+@dispatcher.message_handler(not HasCar(), state=EditCarFSM.result_handling)
 async def create_result_handling(message: types.Message, state: FSMContext):
     """
     This state function handles user answer after create confirmation question
@@ -285,7 +285,6 @@ async def create_result_handling(message: types.Message, state: FSMContext):
         message_from_user = message.text
         name_func = inspect.getframeinfo(inspect.currentframe()).function
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
-        # pylint: disable=R0801
         if message.text == "Всё верно":
             try:
                 data = await state.get_data()
@@ -307,7 +306,6 @@ async def create_result_handling(message: types.Message, state: FSMContext):
                     f"model:{data.get('model')} brand:{data.get('brand')} "
                     f"number_plate:{data.get('number_plate')}",
                 )
-            # pylint: disable=R0801
             except DatabaseException as error:
                 await message.answer(text=str(error))
                 logger.error_from_handlers(
@@ -345,7 +343,7 @@ async def create_result_handling(message: types.Message, state: FSMContext):
             await message.answer(
                 text="Что-то пошло не так, попробуйте ещё раз :(", reply_markup=buttons.main_menu_authorised
             )
-            logger.warning(
+            logger.warning_from_handlers(
                 Loggers.APP.value,
                 tg_user_id,
                 name_func,
@@ -372,7 +370,6 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
         message_from_user = message.text
         name_func = inspect.getframeinfo(inspect.currentframe()).function
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
-        # pylint: disable=R0801
         if message.text == "Всё верно":
             try:
                 data = await state.get_data()
@@ -382,7 +379,6 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
                 logger.info_from_handlers(
                     Loggers.APP.value, tg_user_id, name_func, message_from_user, f"успешно изменил авто на {data}"
                 )
-            # pylint: disable=R0801
             except DatabaseException as error:
                 await message.answer(text=str(error))
                 logger.error_from_handlers(
@@ -412,7 +408,7 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
             await message.answer(
                 text="Что-то пошло не так, попробуйте ещё раз :(", reply_markup=buttons.main_menu_authorised
             )
-            logger.warning(
+            logger.warning_from_handlers(
                 Loggers.APP.value, tg_user_id, name_func, message_from_user, "возникла ошибка при редактировании авто"
             )
     except Exception as ex:
@@ -423,14 +419,12 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
         logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: edit_result_handling")
 
 
-# pylint:disable=W0511
 @dispatcher.message_handler(ChatWithABot(), GroupMember(), HasCar(), text=["Редактировать автомобиль"])
 async def update_car_info(message: types.Message):
     """
     This function shall start UpdateProfileFSM
     @param message: Message object
     """
-    # pylint:disable=W0511
     try:
         tg_user_id = message.from_user.id
         message_from_user = message.text
@@ -495,7 +489,6 @@ async def delete_result_handling(message: types.Message, state: FSMContext):
             logger.info_from_handlers(
                 Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "автомобиль удален"
             )
-        # pylint: disable=R0801
         elif message.text == "Отменить":
             await state.finish()
             await message.answer(text="Как будете готовы - возвращайтесь!", reply_markup=buttons.main_menu_authorised)
@@ -504,7 +497,7 @@ async def delete_result_handling(message: types.Message, state: FSMContext):
             await message.answer(
                 text="Что-то пошло не так, попробуйте ещё раз :(", reply_markup=buttons.main_menu_authorised
             )
-            logger.warning(
+            logger.warning_from_handlers(
                 Loggers.APP.value, tg_user_id, name_func, message_from_user, "возникла ошибка при удалении авто"
             )
     except Exception as ex:
