@@ -122,7 +122,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: cancel_handler(создание заявки)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: cancel_handler(создание заявки)")
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember(), HasCar(), Text(equals=["Создать заявку"], ignore_case=True))
@@ -144,7 +144,7 @@ async def choice_date(message: types.Message):
         )
         await CreateRideRequest.date.set()
         await message.answer(
-            "Выберите дату " + emoji.emojize(":calendar:") + " Или напишите дату в формате XX.XX",
+            "Выберите дату " + emoji.emojize(":calendar:") + "\nИли напишите дату в формате XX.XX",
             reply_markup=buttons.date_keyboard,
         )
     except Exception as ex:
@@ -152,7 +152,7 @@ async def choice_date(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: choice_date(создание заявки)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: choice_date(создание заявки)")
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember(), ~HasCar(), Text(equals=["Создать заявку"], ignore_case=True))
@@ -181,7 +181,7 @@ async def not_car(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: not_car(создание заявки)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: not_car(создание заявки)")
 
 
 @dispatcher.message_handler(state=CreateRideRequest.date)
@@ -214,7 +214,7 @@ async def process_date(message: types.Message, state: FSMContext):
                 "Пользователь указал дату в неверном формате",
             )
             await message.answer(
-                "Выберите дату " + emoji.emojize(":calendar:") + " Или напишите дату в формате XX.XX",
+                "Выберите дату " + emoji.emojize(":calendar:") + "\nИли напишите дату в формате XX.XX",
                 reply_markup=buttons.date_keyboard,
             )
             await CreateRideRequest.date.set()
@@ -223,7 +223,7 @@ async def process_date(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: process_date(создание заявки)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_date(создание заявки)")
 
 
 @dispatcher.message_handler(state=CreateRideRequest.time)
@@ -266,7 +266,7 @@ async def process_time(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: process_time(создание заявки)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_time(создание заявки)")
 
 
 @dispatcher.message_handler(state=CreateRideRequest.delivery_terms)
@@ -295,7 +295,7 @@ async def process_terms_delivery(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: process_terms_delivery(создание заявки)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_terms_delivery(создание заявки)")
 
 
 @dispatcher.message_handler(state=CreateRideRequest.place_departure)
@@ -321,7 +321,7 @@ async def process_place_departure(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: process_place_departure(создание заявки)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_place_departure(создание заявки)")
 
 
 @dispatcher.message_handler(state=CreateRideRequest.place_comming)
@@ -347,7 +347,7 @@ async def process_place_comming(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: process_place_comming(создание заявки)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_place_comming(создание заявки)")
 
 
 @dispatcher.message_handler(state=CreateRideRequest.number_of_seats)
@@ -419,7 +419,7 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: process_number_of_seats(создание заявки)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_number_of_seats(создание заявки)")
 
 
 @dispatcher.message_handler(state=CreateRideRequest.driver)
@@ -543,4 +543,4 @@ async def process_driver(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: process_driver(создание заявки)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_driver(создание заявки)")

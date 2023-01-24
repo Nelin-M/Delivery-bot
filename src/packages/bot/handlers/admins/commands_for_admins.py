@@ -30,4 +30,4 @@ async def admin_start(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: admin_start")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: admin_start")

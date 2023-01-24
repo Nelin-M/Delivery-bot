@@ -22,4 +22,4 @@ async def inform_admins(dispatcher: Dispatcher):
             except Exception as exception:
                 logger.critical(Loggers.APP.value, f"Unexpected error: {exception}")
     except Exception as ex:
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: inform_admins")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: inform_admins")

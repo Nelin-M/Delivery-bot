@@ -41,7 +41,7 @@ async def not_signed(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: not_signed")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: not_signed")
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember())

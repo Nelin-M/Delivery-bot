@@ -98,7 +98,7 @@ async def my_ride_requests_start(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: my_ride_requests_start")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: my_ride_requests_start")
 
 
 @dispatcher.callback_query_handler(lambda call: "delete_ride_request" in call.data)
@@ -138,4 +138,4 @@ async def send_message(call: CallbackQuery):
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Заявка удалена")
     except Exception as ex:
         await call.answer("По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже")
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: send_message(удаление авто)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: send_message(удаление авто)")

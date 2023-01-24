@@ -57,4 +57,4 @@ async def user_subscribe(call: types.CallbackQuery):
             )
     except Exception as ex:
         await call.answer("По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже")
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: user_subscribe")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: user_subscribe")

@@ -56,7 +56,7 @@ async def car_info_car_added(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: car_info_car_added")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: car_info_car_added")
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember(), text=["Мой автомобиль"])
@@ -79,7 +79,7 @@ async def car_info_no_car(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: car_info_no_car")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: car_info_no_car")
 
 
 @dispatcher.callback_query_handler(ChatWithABotCallback(), GroupMemberCallback(), text="Добавить автомобиль")
@@ -107,7 +107,7 @@ async def edit_start(call: types.CallbackQuery):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: edit_start(добавление авто)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: edit_start(добавление авто)")
 
 
 @dispatcher.callback_query_handler(state=EditCarFSM.brand)
@@ -137,7 +137,7 @@ async def edit_brand(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: edit_brand")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: edit_brand")
 
 
 @dispatcher.message_handler(state=EditCarFSM.model)
@@ -176,7 +176,7 @@ async def edit_model(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: edit_model")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: edit_model")
 
 
 @dispatcher.message_handler(state=EditCarFSM.number_plate)
@@ -213,7 +213,7 @@ async def edit_number_plate(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: edit_number_plate")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: edit_number_plate")
 
 
 @dispatcher.message_handler(state=EditCarFSM.confirmation)
@@ -270,7 +270,7 @@ async def edit_confirmation(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: edit_confirmation")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: edit_confirmation")
 
 
 @dispatcher.message_handler(~HasCar(), state=EditCarFSM.result_handling)
@@ -357,7 +357,7 @@ async def create_result_handling(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: create_result_handling")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: create_result_handling")
 
 
 @dispatcher.message_handler(HasCar(), state=EditCarFSM.result_handling)
@@ -420,7 +420,7 @@ async def edit_result_handling(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: edit_result_handling")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: edit_result_handling")
 
 
 # pylint:disable=W0511
@@ -442,7 +442,7 @@ async def update_car_info(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: update_car_info")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: update_car_info")
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember(), HasCar(), text=["Удалить автомобиль"])
@@ -465,7 +465,7 @@ async def delete_start(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: delete_start")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: delete_start")
 
 
 @dispatcher.message_handler(state=DeleteCarFSM.confirmation)
@@ -512,4 +512,4 @@ async def delete_result_handling(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: delete_result_handling")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: delete_result_handling")
