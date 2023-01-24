@@ -111,14 +111,18 @@ disable=
     # Custom rules
     import-error,
     too-few-public-methods,
-    unnecessary-pass
+    unnecessary-pass,
     raise-missing-from,
     consider-iterating-dictionary,
-    no-self-use,
     too-many-arguments,
     missing-module-docstring,
     duplicate-code,
     no-name-in-module,
+    consider-using-alias,
+    missing-raises-doc,
+    arguments-differ,
+    # Questionable
+    consider-alternative-union-syntax,
     # Failed to fully solve the problem with sys.path
     import-error,
 
