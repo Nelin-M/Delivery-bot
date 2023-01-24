@@ -26,7 +26,7 @@ async def write_complaint(message: types.Message):
         name_func = inspect.getframeinfo(inspect.currentframe()).function
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
         await message.answer(
-            "Если сотрудник, повёл себя оскорбительно или у вас возник конфликт, опишите, пожалуйста, ситуацию."
+            "Если сотрудник, повёл себя оскорбительно или у вас возник конфликт, опишите ниже, пожалуйста, ситуацию."
             " Информация будет рассмотрена нашими модераторами и мы примем меры, при описании, укажите: номер машины"
             " или телеграм ник водителя или пассажира",
             reply_markup=buttons.car_edit_cancel,

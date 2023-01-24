@@ -48,7 +48,8 @@ async def write_review(call: types.CallbackQuery):
         name_func = inspect.getframeinfo(inspect.currentframe()).function
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
         await call.message.answer(
-            "Ваш отзыв будет опубликован в группе, ждем предложений и пожеланий:", reply_markup=buttons.car_edit_cancel
+            "Ваш отзыв будет опубликован в группе, напишите ниже предложение и пожелание:",
+            reply_markup=buttons.car_edit_cancel,
         )
         await CreateReview.review_text.set()
     except Exception as ex:
