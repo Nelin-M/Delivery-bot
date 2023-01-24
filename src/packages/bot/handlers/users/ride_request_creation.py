@@ -149,9 +149,7 @@ async def choice_date(message: types.Message):
         logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: choice_date(создание заявки)")
 
 
-@dispatcher.message_handler(
-    ChatWithABot(), GroupMember(), not HasCar(), Text(equals=["Создать заявку"], ignore_case=True)
-)
+@dispatcher.message_handler(ChatWithABot(), GroupMember(), ~HasCar(), Text(equals=["Создать заявку"], ignore_case=True))
 async def not_car(message: types.Message):
     """
     This function shows message use without car

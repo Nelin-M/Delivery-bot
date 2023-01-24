@@ -273,7 +273,7 @@ async def edit_confirmation(message: types.Message, state: FSMContext):
         logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: edit_confirmation")
 
 
-@dispatcher.message_handler(not HasCar(), state=EditCarFSM.result_handling)
+@dispatcher.message_handler(~HasCar(), state=EditCarFSM.result_handling)
 async def create_result_handling(message: types.Message, state: FSMContext):
     """
     This state function handles user answer after create confirmation question
