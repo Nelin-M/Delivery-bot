@@ -4,8 +4,10 @@ Module to keep texts used in bot answers
 from src.packages.loaders import env_variables
 
 group_link = env_variables.get("CHANNEL_LINK")
+# todo: реализовать модуль для выдачи текстов, с указанием разметки,
+#  проверкой на корректность разметки и экранировкой символов, например, символов в ссылках
 MAIN_MENU_AUTHORISED = (
-    f"Созданные внутри бота заявки публикуются в телеграм канале:\nТелеграм: {group_link} \n\n"
+    f"Созданные внутри бота заявки публикуются в [данном]({group_link}) телеграм канале.\n\n"
     f"[Инструкция по созданию заявки]"
     f"({'https://telegra.ph/Instrukciyu-po-ispolzovaniyu-servisa-DeliveryBot-09-06'})\n\n"
     f"Продолжая пользоваться сервисом вы подтверждаете ваше согласие с "
