@@ -200,7 +200,7 @@ async def process_date(message: types.Message, state: FSMContext):
             )
         else:
             await message.reply("Вы указали дату в неверном формате!")
-            logger.warning_from_handlers(
+            logger.info_from_handlers(
                 Loggers.INCOMING.value,
                 tg_user_id,
                 name_func,
@@ -318,8 +318,8 @@ async def process_place_departure(message: types.Message, state: FSMContext):
         logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_place_departure(создание заявки)")
 
 
-@dispatcher.message_handler(state=CreateRideRequest.place_comming)
-async def process_place_comming(message: types.Message, state: FSMContext):
+@dispatcher.message_handler(state=CreateRideRequest.place_coming)
+async def process_place_coming(message: types.Message, state: FSMContext):
     """
     This function save destination place
     @param message: Message object
@@ -341,7 +341,7 @@ async def process_place_comming(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_place_comming(создание заявки)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_place_coming(создание заявки)")
 
 
 @dispatcher.message_handler(state=CreateRideRequest.number_of_seats)

@@ -301,8 +301,8 @@ async def process_place_departure(message: types.Message, state: FSMContext):
         )
 
 
-@dispatcher.message_handler(state=CreateTaxiRideRequest.place_comming)
-async def process_place_comming(message: types.Message, state: FSMContext):
+@dispatcher.message_handler(state=CreateTaxiRideRequest.place_coming)
+async def process_place_coming(message: types.Message, state: FSMContext):
     """
     This function save destination place
     @param message: Message object
@@ -328,9 +328,7 @@ async def process_place_comming(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(
-            Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_place_comming(создание заявки на такси)"
-        )
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_place_coming(создание заявки на такси)")
 
 
 @dispatcher.message_handler(state=CreateTaxiRideRequest.number_of_seats)

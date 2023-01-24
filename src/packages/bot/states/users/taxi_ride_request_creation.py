@@ -13,6 +13,6 @@ class CreateTaxiRideRequest(StatesGroup):
     time = State()
     delivery_terms = State()
     place_departure = State()
-    place_comming = State()
+    place_coming = State()
     number_of_seats = State()
     author = State()

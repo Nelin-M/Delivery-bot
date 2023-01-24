@@ -12,11 +12,12 @@ from src.packages.bot.other.throttling import rate_limit
 from src.packages.loaders import env_variables
 from src.packages.logger import logger, Loggers
 
-admins = env_variables.get("ADMINS").split(",")
+admins = env_variables.get("ADMINS").replace(" ", "").split(",")
 
 
+# Handler is off
 @rate_limit(limit=10)
-@dispatcher.message_handler(ChatWithABot(), GroupMember(), CommandStart(), user_id=admins)
+@dispatcher.message_handler(False, ChatWithABot(), GroupMember(), CommandStart(), user_id=admins)
 async def admin_start(message: types.Message):
     """
     The /start command for the administrator

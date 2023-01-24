@@ -45,12 +45,14 @@ async def car_info_car_added(message: types.Message):
                 Loggers.APP.value, tg_user_id, name_func, message_from_user, "Пользователь добавлен в базу"
             )
         try:
+            # todo: refactor
             car = await CarTable.get_by_user_id(user.id)
+            await message.answer(
+                text=f"Ваш авто:" f"\n{car.brand} {car.model}" f"\n{car.number_plate}",
+                reply_markup=buttons.car_added_menu,
+            )
         except DatabaseException:
             logger.error_from_handlers(Loggers.APP.value, tg_user_id, name_func, message_from_user, "авто нет в базе")
-        await message.answer(
-            text=f"Ваш авто:" f"\n{car.brand} {car.model}" f"\n{car.number_plate}", reply_markup=buttons.car_added_menu
-        )
     except Exception as ex:
         await message.answer(
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
