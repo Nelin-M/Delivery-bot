@@ -3,9 +3,7 @@ This module for creating ride request
 """
 # pylint:disable=broad-except
 import inspect
-import re
-from datetime import datetime, date, time
-
+from datetime import datetime
 import aiogram.utils.markdown as md
 import emoji
 from aiogram import types
@@ -26,7 +24,18 @@ channel_link = env_variables.get("CHANNEL_LINK")
 bot_link = env_variables.get("BOT_LINK")
 
 
-def refactor_str(str_input: str):
+def escape_md(text: str or int):
+    # todo: найти аналог в библиотеке
+    text = str(text)
+    text = text.replace("_", "\\_")
+    text = text.replace("*", "\\*")
+    text = text.replace("`", "\\`")
+    text = text.replace("~", "\\~")
+    text = text.replace("|", "\\|")
+    return text
+
+
+def refactor_str(str_input: str or int):
     """
     This function refactor string
     """
@@ -38,48 +47,41 @@ def handler_date(str_date: str):
     """
     This function refactor str in date
     """
-    lst_date = str_date.split(".")
-    day = int(lst_date[0])
-    month = int(lst_date[1])
-    year = datetime.now().year
-    return date(year, month, day)
+    date_obj = datetime.strptime(str_date, "%d.%m")
+    date_obj = date_obj.date()
+    date_obj = date_obj.replace(year=datetime.now().year)
+    return date_obj
 
 
 def handler_time(str_time: str):
     """
     This function refactor str in time
     """
-    lst_time = str_time.split(":")
-    hour = int(lst_time[0])
-    minute = int(lst_time[1])
-    second = 0
-    return time(hour, minute, second)
+    time_obj = datetime.strptime(str_time, "%H:%M")
+    time_obj = time_obj.time()
+    return time_obj
 
 
 def validation_date(text: str):
     """
     This function validates the date entered by the user
     """
-    return (
-        re.findall(r"\d\d\.\d\d", f"r'{text}'")
-        and int(text.split(".")[0]) >= 0
-        and int(text.split(".")[0]) <= 31
-        and int(text.split(".")[1]) >= 1
-        and int(text.split(".")[1]) < 12
-    )
+    try:
+        datetime.strptime(text, "%d.%m")
+        return True
+    except ValueError:
+        return False
 
 
 def validation_time(text: str):
     """
     This function validates the time entered by the user
     """
-    return (
-        re.findall(r"\d\d:\d\d", f"r'{text}'")
-        and int(text.split(":")[0]) >= 0
-        and int(text.split(":")[0]) < 24
-        and int(text.split(":")[1]) >= 0
-        and int(text.split(":")[1]) < 60
-    )
+    try:
+        datetime.strptime(text, "%H:%M")
+        return True
+    except ValueError:
+        return False
 
 
 def validation_number_seats(text: str):
@@ -90,7 +92,7 @@ def validation_number_seats(text: str):
         text = int(text)
     except ValueError:
         return False
-    return int(text) > 0 and int(text) < 8
+    return 0 < int(text) < 8
 
 
 @dispatcher.message_handler(state="*", commands="Отмена")
@@ -195,7 +197,7 @@ async def process_date(message: types.Message, state: FSMContext):
                 data["date_ride"] = handler_date(message.text)
             await CreateRideRequest.next()
             await message.answer(
-                "Выберите время из предложенных или укажите время в формате XX:XX.\n" + "Например 07:15",
+                "Выберите время из предложенных или укажите время в формате XX:XX.\nНапример 07:15",
                 reply_markup=buttons.time_keyboard,
             )
         else:
@@ -251,7 +253,7 @@ async def process_time(message: types.Message, state: FSMContext):
                 "Пользователь указал время в неверном формате",
             )
             await message.answer(
-                "Выберите время из предложенных или укажите время в формате XX:XX.\n" + "Например 07:15",
+                "Выберите время из предложенных или укажите время в формате XX:XX.\nНапример 07:15",
                 reply_markup=buttons.time_keyboard,
             )
             await CreateRideRequest.time.set()
@@ -369,26 +371,26 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
                 message.chat.id,
                 md.text(
                     md.text(
-                        f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Водитель: ")}{message.from_user.first_name if message.from_user.first_name is not None else ""} {message.from_user.last_name if message.from_user.last_name is not None else ""} '
+                        f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Водитель: ")}{escape_md(message.from_user.first_name)} {escape_md(message.from_user.last_name) if message.from_user.last_name is not None else ""} '
                     ),
                     md.text(
                         f'{emoji.emojize(":oncoming_automobile:")}{md.bold(" Машина: ")}'
-                        f"{car.brand} {car.model} ({car.number_plate[:6]} {car.number_plate[6:]})"
+                        f"{escape_md(car.brand)} {escape_md(car.model)} ({car.number_plate[:6]} {car.number_plate[6:]})"
                     ),
                     md.text(
                         f'{emoji.emojize(":calendar:")}{md.bold(" Дата и время: ")}{refactor_str(data["date_ride"].day if data.get("date_ride") is not None else "")}.'
-                        f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.{data["date_ride"].year if data.get("date_ride") is not None else ""} в '
+                        f'{refactor_str(data["date_ride"].month if data.get("date_ride") is not None else "")}.{refactor_str(data["date_ride"].year) if data.get("date_ride") is not None else ""} в '
                         f'{refactor_str(data["time_ride"].hour if data.get("time_ride") is not None else "")}:{refactor_str(data["time_ride"].minute if data.get("time_ride") is not None else "")}'
                     ),
                     md.text(
                         f"{md.bold('Условия довоза: ')}\n"
-                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"
+                        f"{escape_md(data['delivery_terms']) if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"
                     ),
                     md.text(
-                        f'{md.bold("🅰 Место отправления:")}\n{data["departure_place"] if data.get("departure_place") is not None else ""}'
+                        f'{md.bold("🅰 Место отправления:")}\n{escape_md(data["departure_place"]) if data.get("departure_place") is not None else ""}'
                     ),
                     md.text(
-                        f'{md.bold("🅱 Место прибытия:")}\n{data["destination_place"] if data.get("destination_place") is not None else ""}'
+                        f'{md.bold("🅱 Место прибытия:")}\n{escape_md(data["destination_place"]) if data.get("destination_place") is not None else ""}'
                     ),
                     md.text(
                         f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
@@ -443,11 +445,11 @@ async def process_driver(message: types.Message, state: FSMContext):
                 md.text(
                     md.text("Заявка создана"),
                     md.text(
-                        f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Водитель: ")}[{message.from_user.first_name} {message.from_user.last_name if message.from_user.last_name is not None else ""}]({message.from_user.url}) '
+                        f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Водитель: ")}[{escape_md(message.from_user.first_name)} {escape_md(message.from_user.last_name) if message.from_user.last_name is not None else ""}]({message.from_user.url}) '
                     ),
                     md.text(
                         f'{emoji.emojize(":oncoming_automobile:")}{md.bold(" Машина: ")}'
-                        f"{car.brand} {car.model} ({car.number_plate[:6]} {car.number_plate[6:]})"
+                        f"{escape_md(car.brand)} {escape_md(car.model)} ({car.number_plate[:6]} {car.number_plate[6:]})"
                     ),
                     md.text(
                         f'{emoji.emojize(":calendar:")}{md.bold(" Дата и время: ")}'
@@ -459,13 +461,13 @@ async def process_driver(message: types.Message, state: FSMContext):
                     ),
                     md.text(
                         f"{md.bold('Условия довоза: ')}\n"
-                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"
+                        f"{escape_md(data['delivery_terms']) if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"
                     ),
                     md.text(
-                        f"{md.bold('🅰 Место отправления:')}\n{data['departure_place'] if data.get('departure_place') is not None else ''}"
+                        f"{md.bold('🅰 Место отправления:')}\n{escape_md(data['departure_place']) if data.get('departure_place') is not None else ''}"
                     ),
                     md.text(
-                        f'{md.bold("🅱 Место прибытия: ")}\n{data["destination_place"] if data.get("destination_place") is not None else ""}'
+                        f'{md.bold("🅱 Место прибытия: ")}\n{escape_md(data["destination_place"]) if data.get("destination_place") is not None else ""}'
                     ),
                     md.text(
                         f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
@@ -487,15 +489,24 @@ async def process_driver(message: types.Message, state: FSMContext):
                 channel_id,
                 md.text(
                     md.text(
-                        f"#водитель #дата\\_{refactor_str(data['date_ride'].day if data.get('date_ride') is not None else '')}"
-                        f"\\_{refactor_str(data['date_ride'].month if data.get('date_ride') is not None else '')}\\_{data['date_ride'].year if data.get('date_ride') is not None else ''} #время\\_{refactor_str(data['time_ride'].hour if data.get('time_ride') is not None else '')}"
-                        f"\\_{refactor_str(data['time_ride'].minute if data.get('time_ride') is not None else '')}\n"
+                        f"{emoji.emojize(':wheel:')} Заявка от водителя"
+                        f"\n\n"
+                        f"{'#' + escape_md('водитель')}"
+                        f"\n"
+                        f"{'#' + escape_md(message.from_user.first_name.replace(' ', '_'))}{escape_md('_' + message.from_user.last_name.replace(' ', '_')) if message.from_user.last_name is not None else ''}"
+                        f"\n"
+                        f"{'#' + escape_md('водитель_дата_') + refactor_str(data['date_ride'].day if data.get('date_ride') is not None else '')}{escape_md('_')}"
+                        f"{refactor_str(data['date_ride'].month if data.get('date_ride') is not None else '')}{escape_md('_')}{data['date_ride'].year if data.get('date_ride') is not None else ''}"
+                        f"\n"
+                        f"{'#' + escape_md('водитель_время_') + refactor_str(data['time_ride'].hour if data.get('time_ride') is not None else '')}"
+                        f"{escape_md('_')}{refactor_str(data['time_ride'].minute if data.get('time_ride') is not None else '')}"
+                        f"\n"
                     ),
                     md.text(
-                        f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Водитель: ")}[{message.from_user.first_name} {message.from_user.last_name if message.from_user.last_name is not None else ""}]({message.from_user.url}) '
+                        f'{emoji.emojize(":bust_in_silhouette:")}{md.bold(" Водитель: ")}[{escape_md(message.from_user.first_name)} {escape_md(message.from_user.last_name) if message.from_user.last_name is not None else ""}]({message.from_user.url}) '
                     ),
                     md.text(
-                        f'{emoji.emojize(":oncoming_automobile:")}{md.bold(" Машина: ")}{car.brand} {car.model} ({car.number_plate[:6]} {car.number_plate[6:]})'
+                        f'{emoji.emojize(":oncoming_automobile:")}{md.bold(" Машина: ")}{escape_md(car.brand)} {escape_md(car.model)} ({car.number_plate[:6]} {car.number_plate[6:]})'
                     ),
                     md.text(
                         f'{emoji.emojize(":calendar:")}{md.bold(" Дата и время: ")}'
@@ -507,18 +518,18 @@ async def process_driver(message: types.Message, state: FSMContext):
                     ),
                     md.text(
                         f"{md.bold('Условия довоза: ')}\n"
-                        f"{data['delivery_terms'] if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"
+                        f"{escape_md(data['delivery_terms']) if data['delivery_terms'] != 'Дальше' and data.get('delivery_terms') is not None else 'Не указано'}"
                     ),
                     md.text(
-                        f"{md.bold('🅰 Место отправления:')}\n{data['departure_place'] if data.get('departure_place') is not None else ''}"
+                        f"{md.bold('🅰 Место отправления:')}\n{escape_md(data['departure_place']) if data.get('departure_place') is not None else ''}"
                     ),
                     md.text(
-                        f'{md.bold("🅱 Место прибытия: ")}\n{data["destination_place"] if data.get("destination_place") is not None else ""}'
+                        f'{md.bold("🅱 Место прибытия: ")}\n{escape_md(data["destination_place"]) if data.get("destination_place") is not None else ""}'
                     ),
                     md.text(
                         f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
                     ),
-                    md.text(f"\nОтправить свою заявку вы можете при помощи бота: {md.escape_md(bot_link)}"),
+                    md.text(f"\nОтправить свою заявку вы можете при помощи бота: {escape_md(bot_link)}"),
                     sep="\n",
                 ),
                 parse_mode=ParseMode.MARKDOWN,

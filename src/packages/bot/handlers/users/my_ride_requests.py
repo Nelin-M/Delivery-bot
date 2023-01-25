@@ -18,7 +18,18 @@ from src.packages.database import UserTable, RideRequestTable
 from src.packages.logger import logger, Loggers
 
 
-def refactor_str(str_input: str):
+def escape_md(text: str or int):
+    # todo: найти аналог в библиотеке
+    text = str(text)
+    text = text.replace("_", "\\_")
+    text = text.replace("*", "\\*")
+    text = text.replace("`", "\\`")
+    text = text.replace("~", "\\~")
+    text = text.replace("|", "\\|")
+    return text
+
+
+def refactor_str(str_input: str or int):
     """
     This function refactor string
     """
@@ -48,24 +59,19 @@ async def my_ride_requests_start(message: types.Message):
                     message.chat.id,
                     md.text(
                         md.text(
-                            f'{md.bold("Водитель/Автор заявки: ")}'
-                            f'{message.from_user.first_name if message.from_user.first_name is not None else ""} '
-                            f'{message.from_user.last_name if message.from_user.last_name is not None else ""} '
-                        ),
-                        md.text(
                             f'{md.bold("Дата и время: ")}{refactor_str(ride_request.date.day)}.'
                             f"{refactor_str(ride_request.date.month)}.{ride_request.date.year} в "
                             f"{refactor_str(ride_request.time.hour)}:{refactor_str(ride_request.time.minute)}"
                         ),
                         md.text(
                             f"{md.bold('Условия довоза: ')}"
-                            f"{ride_request.delivery_terms if ride_request.delivery_terms != 'Дальше' and ride_request.delivery_terms is not None else 'Не указано'}"
+                            f"{escape_md(ride_request.delivery_terms) if ride_request.delivery_terms != 'Дальше' and ride_request.delivery_terms is not None else 'Не указано'}"
                         ),
                         md.text(
-                            f'{md.bold("Место отправления: ")}{"" if ride_request.departure_place is None else ride_request.departure_place}'
+                            f'{md.bold("Место отправления: ")}{"" if ride_request.departure_place is None else escape_md(ride_request.departure_place)}'
                         ),
                         md.text(
-                            f'{md.bold("Место прибытия: ")}{"" if ride_request.destination_place is None else ride_request.destination_place}'
+                            f'{md.bold("Место прибытия: ")}{"" if ride_request.destination_place is None else escape_md(ride_request.destination_place)}'
                         ),
                         md.text(
                             f'{md.bold("Количество мест: ")}{"" if ride_request.seats_number is None else ride_request.seats_number}'
