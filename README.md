@@ -1,4 +1,4 @@
-# По пути
+# Оn the way (По пути)
 
 ## Getting Started
 
@@ -114,5 +114,4 @@ In order to enter the database, you need to specify parameters similar to the pa
 * **Shatilova Daria** – [GitHub](https://github.com/solovyova-1996)
 * **Zharkov Valery** – [GitHub](https://github.com/Lykor)
 * **Manyakin Vyacheslav** – [GitHub](https://github.com/vmanyakin)
-* **Ramil Arsymbekov** – [GitHub](https://github.com/arsy-off)
 * **Wagner Roman** – [GitHub](https://github.com/Cartez55)
