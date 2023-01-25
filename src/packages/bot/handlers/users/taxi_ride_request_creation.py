@@ -504,7 +504,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                     md.text(
                         f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
                     ),
-                    md.text(f"\nОтправить свою заявку вы можете при помощи бота: {bot_link}"),
+                    f"\nОтправить свою заявку вы можете при помощи бота: {md.escape_md(bot_link)}",
                     sep="\n",
                 ),
                 parse_mode=ParseMode.MARKDOWN,
