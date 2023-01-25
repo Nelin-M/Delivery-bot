@@ -14,7 +14,6 @@ class DatabaseException(Exception):
     """
 
 
-# pylint: disable=R0904:
 class Database:
     """
     Database class.The class contains the necessary
@@ -30,26 +29,21 @@ class Database:
 
     async def connect_db(self):
         """
-        method to connect to postgres database
+        Method to connect to postgres database
         """
         try:
             await db.set_bind(
                 f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}"
             )
-        # pylint: disable=W0703:
         except Exception as exception:
             logger.critical(Loggers.APP.value, f"Unexpected error: {exception}")
             raise exception
 
+    # pylint:disable=unused-private-member
     @staticmethod
-    # pylint: disable=W0238:
     async def __drop_tables():
         await db.gino.drop_all()
 
     @staticmethod
-    # pylint: disable=W0238:
     async def create_tables():
-        """
-        Create table
-        """
         await db.gino.create_all()

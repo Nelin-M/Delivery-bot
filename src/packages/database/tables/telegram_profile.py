@@ -18,6 +18,7 @@ class TelegramProfileTable:
         @param tg_id: id from telegram
         @param user_id: id from tables users
         @param nickname: nickname from telegram
+        @raise DatabaseException: if telegram profile already exists in the database
         """
         try:
             tg_profile = TgProfile(tg_id=tg_id, user_id=user_id, nickname=nickname)

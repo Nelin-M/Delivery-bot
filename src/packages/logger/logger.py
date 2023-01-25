@@ -97,7 +97,7 @@ class Log:
             raise LoggerException(f"Unexpected error: {exception}.") from exception
 
     def info_from_handlers(
-        self, logger_name: str, tg_id: int, name_func: str, message_from_user: str, text_info=""
+        self, logger_name: str, tg_id: int, name_func: str, message_from_user: str, text_info: str = ""
     ) -> None:
         """
         Logging a message with the severity of _info_.

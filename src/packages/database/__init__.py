@@ -4,7 +4,6 @@ Initialization file for the packages database, schemas.
 from .database import *
 from .tables import *
 
-# pylint:disable=E0603
 __all__ = [
     "database",
     "setup_database",

@@ -34,7 +34,7 @@ async def user_start(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: user_start(обратная связь)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: user_start(обратная связь)")
 
 
 @dispatcher.callback_query_handler(ChatWithABotCallback(), GroupMemberCallback(), text="Оставить отзыв")
@@ -48,7 +48,8 @@ async def write_review(call: types.CallbackQuery):
         name_func = inspect.getframeinfo(inspect.currentframe()).function
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
         await call.message.answer(
-            "Ваш отзыв будет опубликован в группе, ждем предложений и пожеланий:", reply_markup=buttons.car_edit_cancel
+            "Ваш отзыв будет опубликован в группе, напишите ниже предложение и пожелание:",
+            reply_markup=buttons.car_edit_cancel,
         )
         await CreateReview.review_text.set()
     except Exception as ex:
@@ -56,7 +57,7 @@ async def write_review(call: types.CallbackQuery):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: write_review(обратная связь)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: write_review(обратная связь)")
 
 
 @dispatcher.message_handler(state=CreateReview.review_text)
@@ -89,4 +90,4 @@ async def send_review_in_group(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: send_review_in_group(обратная связь)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: send_review_in_group(обратная связь)")

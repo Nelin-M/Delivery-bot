@@ -54,7 +54,6 @@ class CarTable:
         This method updates Car object
         @param car_id: Car.id
         @param data: data to update
-        @return:
         """
         # try:
         car = await cls.get(car_id)
@@ -67,7 +66,6 @@ class CarTable:
         """
         This method deletes Car object
         @param car_id: Car.id
-        @return:
         """
         # try:
         car = await cls.get(car_id)

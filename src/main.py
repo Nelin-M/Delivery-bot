@@ -19,7 +19,6 @@ async def connecting_file(load_dispatcher):
     The function adds additional functionality
     """
 
-    # pylint: disable=W0511
     await setup_database(database)  # TODO: Не совсем понятен момент с инициализацией БД
 
     setup_filters(dispatcher)

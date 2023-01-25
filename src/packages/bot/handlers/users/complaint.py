@@ -26,8 +26,8 @@ async def write_complaint(message: types.Message):
         name_func = inspect.getframeinfo(inspect.currentframe()).function
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
         await message.answer(
-            "Если сотрудник, повёл себя оскорбительно или у вас возник конфликт, опишите, пожалуйста, ситуацию."
-            " Информация будет рассмотрена нашими модераторами и мы примем меры, при описание, укажите: номер машины"
+            "Если сотрудник, повёл себя оскорбительно или у вас возник конфликт, опишите ниже, пожалуйста, ситуацию."
+            " Информация будет рассмотрена нашими модераторами и мы примем меры, при описании, укажите: номер машины"
             " или телеграм ник водителя или пассажира",
             reply_markup=buttons.car_edit_cancel,
         )
@@ -37,7 +37,7 @@ async def write_complaint(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: write_complaint")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: write_complaint")
 
 
 @dispatcher.message_handler(state=CreateComplaint.complaint_text)
@@ -68,4 +68,4 @@ async def send_complaint_in_group(message: types.Message, state: FSMContext):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: send_complaint_in_group")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: send_complaint_in_group")

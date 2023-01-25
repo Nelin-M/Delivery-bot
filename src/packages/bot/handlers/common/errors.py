@@ -17,13 +17,13 @@ async def not_signed(message: types.Message):
     The function gives a button with a link to the group if the bot user is not subscribed to it
     """
     try:
-        group_link = env_variables.get("CHANNEL_LINK")
+        channel_link = env_variables.get("CHANNEL_LINK")
 
         subscribe = InlineKeyboardMarkup(
             row_width=2,
             inline_keyboard=[
                 [
-                    InlineKeyboardButton(text="Подписаться", url=group_link),
+                    InlineKeyboardButton(text="Подписаться", url=channel_link),
                     InlineKeyboardButton(
                         text="Проверить подписку", callback_data=f"Проверить подписку|{message.from_user.id}"
                     ),
@@ -41,7 +41,7 @@ async def not_signed(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: not_signed")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: not_signed")
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember())

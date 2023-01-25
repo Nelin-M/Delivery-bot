@@ -1,12 +1,12 @@
 """
-This module for creating state ride request
+This module for creating state taxi ride request
 """
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-class CreateRideRequest(StatesGroup):
+class CreateTaxiRideRequest(StatesGroup):
     """
-    This class for creating state ride request
+    This class for creating state taxi ride request
     """
 
     date = State()
@@ -15,4 +15,4 @@ class CreateRideRequest(StatesGroup):
     place_departure = State()
     place_coming = State()
     number_of_seats = State()
-    driver = State()
+    author = State()

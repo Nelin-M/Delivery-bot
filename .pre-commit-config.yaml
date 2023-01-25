@@ -13,7 +13,7 @@ repos:
           - --line-length=120
 
   - repo: https://github.com/pycqa/pylint
-    rev: v2.11.1
+    rev: v2.15.10
     hooks:
       - id: pylint
         args:

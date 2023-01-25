@@ -18,10 +18,20 @@ from src.packages.database import UserTable, RideRequestTable
 from src.packages.logger import logger, Loggers
 
 
-def refactor_str(str_input):
+def escape_md(text: str or int):
+    # todo: найти аналог в библиотеке
+    text = str(text)
+    text = text.replace("_", "\\_")
+    text = text.replace("*", "\\*")
+    text = text.replace("`", "\\`")
+    text = text.replace("~", "\\~")
+    text = text.replace("|", "\\|")
+    return text
+
+
+def refactor_str(str_input: str or int):
     """
     This function refactor string
-    @param str_input: str
     """
     str_input = str(str_input)
     return f"{str_input if len(str_input) == 2 else '0' + str_input}"
@@ -49,32 +59,26 @@ async def my_ride_requests_start(message: types.Message):
                     message.chat.id,
                     md.text(
                         md.text(
-                            f'{md.bold("Водитель: ")}'
-                            f'{message.from_user.first_name if message.from_user.first_name is not None else ""} '
-                            f'{message.from_user.last_name if message.from_user.last_name is not None else ""} '
-                        ),
-                        md.text(
                             f'{md.bold("Дата и время: ")}{refactor_str(ride_request.date.day)}.'
                             f"{refactor_str(ride_request.date.month)}.{ride_request.date.year} в "
                             f"{refactor_str(ride_request.time.hour)}:{refactor_str(ride_request.time.minute)}"
                         ),
                         md.text(
                             f"{md.bold('Условия довоза: ')}"
-                            f"{ride_request.delivery_terms if ride_request.delivery_terms != 'Дальше' and ride_request.delivery_terms is not None else 'Не указано'}"  # pylint: disable=line-too-long
+                            f"{escape_md(ride_request.delivery_terms) if ride_request.delivery_terms != 'Дальше' and ride_request.delivery_terms is not None else 'Не указано'}"
                         ),
                         md.text(
-                            f'{md.bold("Место отправления: ")}{"" if ride_request.departure_place is None else ride_request.departure_place}'  # pylint: disable=line-too-long
+                            f'{md.bold("Место отправления: ")}{"" if ride_request.departure_place is None else escape_md(ride_request.departure_place)}'
                         ),
                         md.text(
-                            f'{md.bold("Место прибытия: ")}{"" if ride_request.destination_place is None else ride_request.destination_place}'  # pylint: disable=line-too-long
+                            f'{md.bold("Место прибытия: ")}{"" if ride_request.destination_place is None else escape_md(ride_request.destination_place)}'
                         ),
                         md.text(
-                            f'{md.bold("Количество мест: ")}{"" if ride_request.seats_number is None else ride_request.seats_number}'  # pylint: disable=line-too-long
+                            f'{md.bold("Количество мест: ")}{"" if ride_request.seats_number is None else ride_request.seats_number}'
                         ),
                         sep="\n",
                     ),
                     parse_mode=ParseMode.MARKDOWN,
-                    # pylint: disable=W0511
                     # TODO: переделать
                     reply_markup=InlineKeyboardMarkup(
                         row_width=2,
@@ -98,7 +102,7 @@ async def my_ride_requests_start(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: my_ride_requests_start")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: my_ride_requests_start")
 
 
 @dispatcher.callback_query_handler(lambda call: "delete_ride_request" in call.data)
@@ -138,4 +142,4 @@ async def send_message(call: CallbackQuery):
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Заявка удалена")
     except Exception as ex:
         await call.answer("По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже")
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: send_message(удаление авто)")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: send_message(удаление авто)")

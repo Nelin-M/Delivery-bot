@@ -1,6 +1,7 @@
 .idea
 .venv
 docs
+logs
 notebooks
 pgdata
 .cz.toml
@@ -8,7 +9,6 @@ pgdata
 .gitignore
 .pre-commit-config.yaml
 .pylintrc
-src/Delivery-bot.log
 docker-compose.yaml
 Dockerfile
 *.md

@@ -8,13 +8,11 @@ from src.packages.database.shemas import RideRequest
 from ..database import DatabaseException
 
 
-# pylint: disable=R0904:
 class RideRequestTable:
     """
     This class is to operate with database ride request table
     """
 
-    # pylint:disable=R0913
     @staticmethod
     async def add(
         author: int,
@@ -82,7 +80,6 @@ class RideRequestTable:
         This method updates RideRequest object
         @param ride_request_id:
         @param data: data to update
-        @return:
         """
         # try:
         ride_request = await cls.get_single_ride_request(ride_request_id)
@@ -95,7 +92,6 @@ class RideRequestTable:
         """
         This method deletes RideRequest object
         @param ride_request_id:
-        @return:
         """
         # try:
         ride_request = await cls.get_single_ride_request(ride_request_id)

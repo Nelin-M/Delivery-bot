@@ -42,7 +42,7 @@ async def user_start(message: types.Message):
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: user_start")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: user_start")
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember(), CommandHelp())
@@ -55,10 +55,14 @@ async def user_help(message: types.Message):
         message_from_user = message.text
         name_func = inspect.getframeinfo(inspect.currentframe()).function
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
-        await message.answer("Здесь можно прописать про использование бота")
+        await message.answer(
+            "[Инструкция по созданию заявки]"
+            f"({'https://telegra.ph/Instrukciyu-po-ispolzovaniyu-servisa-DeliveryBot-09-06'})\n\n",
+            parse_mode=types.ParseMode.MARKDOWN,
+        )
     except Exception as ex:
         await message.answer(
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
             reply_markup=buttons.main_menu_authorised,
         )
-        logger.critical(Loggers.APP.value, f"Ошибка{str(ex)}, функция: user_help")
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: user_help")

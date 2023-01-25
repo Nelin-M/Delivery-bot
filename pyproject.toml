@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Delivery-bot"
-version = "1.0.1"
+version = "1.1.0"
 description = "Bot for organizing the delivery of Sberbank employees"
 authors = ["Maxim Nelin <nelin.max0@gmail.com>"]
 
@@ -15,7 +15,6 @@ matplotlib = "^3.5.2"
 aiogram = "^2.20"
 python-dotenv = "^0.20.0"
 scipy = "^1.8.1"
-pylint = "2.11.1"
 asyncpg = "^0.26.0"
 gino = "^1.0.1"
 emoji = "^2.0.0"
@@ -26,6 +25,9 @@ pylint = "^2.11.1"
 commitizen = "^2.20.0"
 pre-commit = "^2.15.0"
 jupyter = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^2.15.10"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
