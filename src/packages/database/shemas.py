@@ -2,7 +2,7 @@
     The file to create database tables
 """
 
-from sqlalchemy import Column, Integer, String, Date, Time, sql, ForeignKey
+from sqlalchemy import Column, Integer, BigInteger, String, Date, Time, sql, ForeignKey
 from sqlalchemy.orm import relationship
 from gino import Gino
 
@@ -37,7 +37,7 @@ class TgProfile(BaseModel):
     """
 
     __tablename__ = "tg_profiles"
-    tg_id = Column(Integer(), primary_key=True, autoincrement=False)
+    tg_id = Column(BigInteger(), primary_key=True, autoincrement=False)
     user_id = Column(Integer(), ForeignKey("users.id", ondelete="cascade", onupdate="cascade"))
     nickname = Column(String(50), nullable=False)
     query: sql.select
@@ -50,7 +50,7 @@ class User(BaseModel):
 
     __tablename__ = "users"
     id = Column(Integer(), primary_key=True)
-    tg_id = Column(Integer(), nullable=False, unique=True)
+    tg_id = Column(BigInteger(), nullable=False, unique=True)
     car_id = Column(Integer())
     telegram_profile = relationship("TgProfile", cascade="all,delete,delete-orphan", passive_deletes=True)
     car = relationship("Car", cascade="all,delete,delete-orphan", passive_deletes=True)
