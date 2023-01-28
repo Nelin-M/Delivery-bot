@@ -10,7 +10,10 @@ add_car_menu = ReplyKeyboardMarkup(
 )
 
 car_added_menu = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Редактировать автомобиль"), KeyboardButton("Удалить автомобиль")]],
+    keyboard=[
+        [KeyboardButton("Редактировать автомобиль"), KeyboardButton("Удалить автомобиль")],
+        [KeyboardButton("Отмена")],
+    ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
