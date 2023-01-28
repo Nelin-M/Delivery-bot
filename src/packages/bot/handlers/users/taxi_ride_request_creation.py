@@ -2,6 +2,7 @@
 This module for creating taxi ride request
 """
 import inspect
+import re
 from datetime import datetime
 import aiogram.utils.markdown as md
 import emoji
@@ -22,8 +23,12 @@ channel_link = env_variables.get("CHANNEL_LINK")
 bot_link = env_variables.get("BOT_LINK")
 
 
+def remove_characters_for_create_hashtag(text: str):
+    return re.sub(r"[^a-zA-Zа-яА-я0-9_]", "", text)
+
+
 def escape_md(text: str or int):
-    # todo: найти аналог в библиотеке
+    # todo: найти аналог в библиотеке aiogram
     text = str(text)
     text = text.replace("_", "\\_")
     text = text.replace("*", "\\*")
@@ -436,6 +441,16 @@ async def process_driver(message: types.Message, state: FSMContext):
                 message_from_user,
                 f"Заявка создана{data}(создание заявки на такси)",
             )
+            processed_name = (
+                message.from_user.first_name
+                if message.from_user.last_name is None
+                else message.from_user.first_name + "_" + message.from_user.last_name
+            )
+            processed_name = processed_name.replace(" ", "_")
+            processed_name = remove_characters_for_create_hashtag(processed_name)
+            processed_name = escape_md(processed_name)
+            if processed_name == "":
+                processed_name = "id_" + str(message.from_user.id % 10000)
             post_in_channel = await bot.send_message(
                 channel_id,
                 md.text(
@@ -444,7 +459,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                         f"\n\n"
                         f"{'#' + escape_md('набор_в_такси')}"
                         f"\n"
-                        f"{'#' + escape_md(message.from_user.first_name.replace(' ', '_'))}{escape_md('_' + message.from_user.last_name.replace(' ', '_')) if message.from_user.last_name is not None else ''}"
+                        f"{'#' + processed_name}"
                         f"\n"
                         f"{'#' + escape_md('такси_дата_') + refactor_str(data['date_ride'].day if data.get('date_ride') is not None else '')}{escape_md('_')}"
                         f"{refactor_str(data['date_ride'].month if data.get('date_ride') is not None else '')}{escape_md('_')}{data['date_ride'].year if data.get('date_ride') is not None else ''}"
