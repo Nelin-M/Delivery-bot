@@ -123,6 +123,7 @@ disable=
     arguments-differ,
     invalid-unary-operand-type,
     # Questionable
+    broad-except,
     consider-alternative-union-syntax,
     # Failed to fully solve the problem with sys.path
     import-error,
