@@ -95,8 +95,7 @@ def validation_number_seats(text: str):
     return 0 < int(text) < 8
 
 
-@dispatcher.message_handler(state="*", commands="Отмена")
-@dispatcher.message_handler(Text(equals="отмена", ignore_case=True), state="*")
+@dispatcher.message_handler(Text(equals="Отмена", ignore_case=True), state="*")
 async def cancel_handler(message: types.Message, state: FSMContext):
     """
     This function to exit to the main menu
@@ -109,9 +108,8 @@ async def cancel_handler(message: types.Message, state: FSMContext):
         name_func = inspect.getframeinfo(inspect.currentframe()).function
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
         current_state = await state.get_state()
-        if current_state is None:
-            return
-        await state.finish()
+        if current_state is not None:
+            await state.finish()
         await message.answer("Вы в главном меню", reply_markup=buttons.main_menu_authorised)
     except Exception as ex:
         await message.answer(
