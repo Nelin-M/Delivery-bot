@@ -141,7 +141,7 @@ async def choice_date(message: types.Message):
         await CreateRideRequest.date.set()
         await message.answer(
             "Выберите дату " + emoji.emojize(":calendar:") + "\nИли напишите дату в формате XX.XX",
-            reply_markup=buttons.date_keyboard,
+            reply_markup=buttons.get_date_keyboard(),
         )
     except Exception as ex:
         await message.answer(
@@ -211,7 +211,7 @@ async def process_date(message: types.Message, state: FSMContext):
             )
             await message.answer(
                 "Выберите дату " + emoji.emojize(":calendar:") + "\nИли напишите дату в формате XX.XX",
-                reply_markup=buttons.date_keyboard,
+                reply_markup=buttons.get_date_keyboard(),
             )
             await CreateRideRequest.date.set()
     except Exception as ex:
@@ -337,7 +337,10 @@ async def process_place_coming(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data["destination_place"] = message.text
         await CreateRideRequest.next()
-        await message.answer("Выберите количество мест:", reply_markup=buttons.number_of_seats_keyboard)
+        await message.answer(
+            "Выберите или введите вручную комфортное количество мест (без учёта вас):",
+            reply_markup=buttons.number_of_seats_keyboard,
+        )
     except Exception as ex:
         await message.answer(
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
@@ -539,7 +542,9 @@ async def process_driver(message: types.Message, state: FSMContext):
         elif message.text == "Редактировать":
             await state.reset_state()
             await CreateRideRequest.date.set()
-            await message.answer("Выберите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.date_keyboard)
+            await message.answer(
+                "Выберите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.get_date_keyboard()
+            )
         else:
             await state.finish()
             await message.answer("Вы в главном меню:", reply_markup=buttons.main_menu_authorised)
