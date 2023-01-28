@@ -50,6 +50,7 @@ keyboard_terms_delivery = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton("Дальше")],
         [KeyboardButton("За шоколадку " + emoji.emojize(":chocolate_bar:"))],
+        # todo: вынести кнопку отмена и добавлять её с помощью метода add()
         [KeyboardButton("Отмена")],
     ],
     resize_keyboard=True,
