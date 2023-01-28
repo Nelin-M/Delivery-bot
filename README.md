@@ -57,7 +57,7 @@ Install dependencies.
 ```shell
 $ sudo apt-get install python3.10-dev
 
-$ poetry install --no-dev
+$ poetry install --only main
 ```
 
 #### Environment variables
@@ -100,7 +100,7 @@ To enable pre-commit on the current repository:
 
 Starting all containers:
 
-`docker-compose up`
+`docker compose up`
 
 Postgres database deployed with options specified in `.env` on port `5432`.
 
