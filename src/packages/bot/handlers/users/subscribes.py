@@ -1,14 +1,11 @@
 """
 Setting up commands for feedback
 """
-# pylint:disable=broad-except
 import inspect
 
 from aiogram import types
-
 from src.packages.bot.filters import ChatWithABotCallback, GroupMemberCallback
 from src.packages.bot.loader import dispatcher
-
 from src.packages.bot.loader import bot
 from src.packages.loaders import env_variables
 from src.packages.logger import logger, Loggers
