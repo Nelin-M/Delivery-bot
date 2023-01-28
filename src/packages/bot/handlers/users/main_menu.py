@@ -1,7 +1,6 @@
 """
 This module represents user enter menu depending on his membership in delivery group
 """
-# pylint:disable=broad-except
 import inspect
 
 from aiogram import types

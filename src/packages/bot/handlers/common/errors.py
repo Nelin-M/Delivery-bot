@@ -1,7 +1,6 @@
 """
 This file processes messages that are not included in the main functionality
 """
-# pylint:disable=broad-except
 from aiogram import types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from src.packages.bot.filters import ChatWithABot, GroupMember

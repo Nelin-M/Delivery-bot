@@ -1,7 +1,6 @@
 """
 This module handles car profile commands
 """
-# pylint:disable=broad-except
 import re
 import inspect
 

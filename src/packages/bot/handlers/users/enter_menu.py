@@ -1,7 +1,6 @@
 """
 Basic commands for the user
 """
-# pylint:disable=broad-except
 import inspect
 
 from aiogram import types

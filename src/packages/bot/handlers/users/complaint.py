@@ -1,7 +1,6 @@
 """
 Setting up commands for complaint
 """
-# pylint:disable=broad-except
 import inspect
 
 from aiogram import types

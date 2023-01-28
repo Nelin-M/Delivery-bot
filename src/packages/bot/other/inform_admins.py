@@ -1,7 +1,6 @@
 """
 Utility for informing admins
 """
-# pylint:disable=broad-except
 from aiogram import Dispatcher
 from src.packages.logger import logger, Loggers
 from src.packages.loaders import env_variables

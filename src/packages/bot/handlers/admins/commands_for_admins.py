@@ -1,7 +1,6 @@
 """
 Commands for admin
 """
-# pylint:disable=broad-except
 from aiogram import types
 from aiogram.dispatcher.filters.builtin import CommandStart
 
