@@ -8,10 +8,9 @@ from src.packages.bot.filters import GroupMember, ChatWithABot
 from src.packages.bot.keyboards import buttons
 from src.packages.bot.loader import dispatcher
 from src.packages.bot.other.throttling import rate_limit
-from src.packages.loaders import env_variables
 from src.packages.logger import logger, Loggers
 
-admins = env_variables.get("ADMINS_ID").replace(" ", "").split(",")
+admins = None
 
 
 # Handler is off
