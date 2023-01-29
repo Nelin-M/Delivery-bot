@@ -6,6 +6,7 @@ import re
 from datetime import datetime
 import aiogram.utils.markdown as md
 import emoji
+from geopy import Yandex
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
@@ -22,6 +23,8 @@ from src.packages.logger import logger, Loggers
 channel_id = env_variables.get("CHANNEL_ID")
 channel_link = env_variables.get("CHANNEL_LINK")
 bot_link = env_variables.get("BOT_LINK")
+api_key_yandex_geokoder = env_variables.get("API_KEY_YANDEX_GEOKODER")
+route_type = "auto"
 
 
 def remove_characters_for_create_hashtag(text: str):
@@ -97,6 +100,14 @@ def validation_number_seats(text: str):
     except ValueError:
         return False
     return 0 < int(text) < 8
+
+
+def create_link_maps(adress_1: str, adress_2: str):
+    """The function generates a route link for two addresses"""
+    geolocator = Yandex(api_key=api_key_yandex_geokoder)
+    location_1 = geolocator.geocode("город Омск " + adress_1)
+    location_2 = geolocator.geocode("город Омск " + adress_2)
+    return f"https://yandex.ru/maps/?rtext={location_1.latitude},{location_1.longitude}~{location_2.latitude},{location_2.longitude}&rtt={route_type}"
 
 
 @dispatcher.message_handler(Text(equals="Отмена", ignore_case=True), state="*")
@@ -338,6 +349,45 @@ async def process_place_coming(message: types.Message, state: FSMContext):
         )
         async with state.proxy() as data:
             data["destination_place"] = message.text
+        async with state.proxy() as data:
+            route_link = create_link_maps(data["departure_place"], data["destination_place"])
+            data["route_link"] = route_link
+            await CreateRideRequest.next()
+            await message.answer(
+                f"Перейдите по [ссылке]({route_link}) и проверьте совпадает ли ваш маршрут с предложенным. Если совпадает нажмите да, ссылка будет прикреплена в заявке:",
+                reply_markup=buttons.yes_no_keyboard,
+                parse_mode=ParseMode.MARKDOWN,
+            )
+
+    except Exception as ex:
+        await message.answer(
+            "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
+            reply_markup=buttons.main_menu_authorised,
+        )
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_place_coming(создание заявки)")
+
+
+@dispatcher.message_handler(state=CreateRideRequest.route_link)
+async def process_route_link(message: types.Message, state: FSMContext):
+    """
+    This function save route link
+    @param message: Message object
+    @param state: FSMContext object
+    """
+    try:
+        tg_user_id = message.from_user.id
+        message_from_user = message.text
+        name_func = inspect.getframeinfo(inspect.currentframe()).function
+        logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Ссылка на маршрут")
+        async with state.proxy() as data:
+            data["route_link"] = data["route_link"] if message.text == "Да" else ""
+            logger.info_from_handlers(
+                Loggers.INCOMING.value,
+                tg_user_id,
+                name_func,
+                message_from_user,
+                f"Ссылка на маршрут {data['route_link']} { '' if message.text == 'Да' else 'не'} добавлена к заявке",
+            )
         await CreateRideRequest.next()
         await message.answer(
             "Выберите или введите вручную комфортное количество мест (без учёта вас):",
@@ -396,6 +446,11 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
                     ),
                     md.text(
                         f'{md.bold("🅱 Место прибытия:")}\n{escape_md(data["destination_place"]) if data.get("destination_place") is not None else ""}'
+                    ),
+                    md.text(
+                        f'🚩Для уточнения маршрута перейдите по [ссылке]({data["route_link"]})'
+                        if len(data.get("route_link")) > 0
+                        else ""
                     ),
                     md.text(
                         f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
@@ -475,6 +530,11 @@ async def process_driver(message: types.Message, state: FSMContext):
                         f'{md.bold("🅱 Место прибытия: ")}\n{escape_md(data["destination_place"]) if data.get("destination_place") is not None else ""}'
                     ),
                     md.text(
+                        f'🚩Для уточнения маршрута перейдите по [ссылке]({data["route_link"]})'
+                        if len(data.get("route_link")) > 0
+                        else ""
+                    ),
+                    md.text(
                         f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
                     ),
                     sep="\n",
@@ -542,6 +602,11 @@ async def process_driver(message: types.Message, state: FSMContext):
                         f'{md.bold("🅱 Место прибытия: ")}\n{escape_md(data["destination_place"]) if data.get("destination_place") is not None else ""}'
                     ),
                     md.text(
+                        f'🚩Для уточнения маршрута перейдите по [ссылке]({data["route_link"]})'
+                        if len(data.get("route_link")) > 0
+                        else ""
+                    ),
+                    md.text(
                         f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
                     ),
                     md.text(f"\nОтправить свою заявку вы можете при помощи бота: {escape_md(bot_link)}"),
@@ -549,6 +614,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                 ),
                 parse_mode=ParseMode.MARKDOWN,
             )
+            del data["route_link"]
             await RideRequestTable.add(post_message_id=post_in_channel.message_id, **data)
 
         elif message.text == "Редактировать":
