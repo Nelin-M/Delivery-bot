@@ -104,6 +104,7 @@ def validation_number_seats(text: str):
 
 def create_link_maps(adress_1: str, adress_2: str):
     """The function generates a route link for two addresses"""
+    # todo: обработка http исключений!
     geolocator = Yandex(api_key=api_key_yandex_geokoder)
     location_1 = geolocator.geocode("город Омск " + adress_1)
     location_2 = geolocator.geocode("город Омск " + adress_2)
