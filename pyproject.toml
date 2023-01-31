@@ -8,13 +8,8 @@ authors = ["Maxim Nelin <nelin.max0@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "3.10.x"
-numpy = "^1.22.4"
-pandas = "^1.4.2"
-sklearn = "^0.0"
-matplotlib = "^3.5.2"
 aiogram = "^2.20"
 python-dotenv = "^0.20.0"
-scipy = "^1.8.1"
 asyncpg = "^0.26.0"
 gino = "^1.0.1"
 emoji = "^2.0.0"
