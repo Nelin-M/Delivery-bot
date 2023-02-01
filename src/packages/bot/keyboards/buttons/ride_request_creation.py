@@ -11,6 +11,7 @@ def handle_date(days: int):
     """
     This function returns the current date plus days
     """
+    # todo: добавить в setting часовой пояс (по дефолту стоит часовой пояс системы)
     return datetime.datetime.now() + datetime.timedelta(days)
 
 
@@ -24,15 +25,18 @@ def str_button(days: int):
     )
 
 
-date_keyboard = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(str_button(0)), KeyboardButton(str_button(1)), KeyboardButton(str_button(2))],
-        [KeyboardButton(str_button(3)), KeyboardButton(str_button(4)), KeyboardButton(str_button(5))],
-        [KeyboardButton(str_button(6)), KeyboardButton(str_button(7)), KeyboardButton(str_button(8))],
-        [KeyboardButton("Отмена")],
-    ],
-    resize_keyboard=True,
-)
+def get_date_keyboard():
+    date_keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(str_button(0)), KeyboardButton(str_button(1)), KeyboardButton(str_button(2))],
+            [KeyboardButton(str_button(3)), KeyboardButton(str_button(4)), KeyboardButton(str_button(5))],
+            [KeyboardButton(str_button(6)), KeyboardButton(str_button(7)), KeyboardButton(str_button(8))],
+            [KeyboardButton("Отмена")],
+        ],
+        resize_keyboard=True,
+    )
+    return date_keyboard
+
 
 keyboard_ok = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton("Отправить"), KeyboardButton("Редактировать")], [KeyboardButton("Отменить заявку")]],
@@ -46,6 +50,7 @@ keyboard_terms_delivery = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton("Дальше")],
         [KeyboardButton("За шоколадку " + emoji.emojize(":chocolate_bar:"))],
+        # todo: вынести кнопку отмена и добавлять её с помощью метода add()
         [KeyboardButton("Отмена")],
     ],
     resize_keyboard=True,

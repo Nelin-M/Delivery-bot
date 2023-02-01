@@ -1,8 +1,8 @@
 """
 This module for creating taxi ride request
 """
-# pylint:disable=broad-except
 import inspect
+import re
 from datetime import datetime
 import aiogram.utils.markdown as md
 import emoji
@@ -23,8 +23,12 @@ channel_link = env_variables.get("CHANNEL_LINK")
 bot_link = env_variables.get("BOT_LINK")
 
 
+def remove_characters_for_create_hashtag(text: str):
+    return re.sub(r"[^a-zA-Zа-яА-я0-9_]", "", text)
+
+
 def escape_md(text: str or int):
-    # todo: найти аналог в библиотеке
+    # todo: найти аналог в библиотеке aiogram
     text = str(text)
     text = text.replace("_", "\\_")
     text = text.replace("*", "\\*")
@@ -108,9 +112,8 @@ async def cancel_handler(message: types.Message, state: FSMContext):
         name_func = inspect.getframeinfo(inspect.currentframe()).function
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
         current_state = await state.get_state()
-        if current_state is None:
-            return
-        await state.finish()
+        if current_state is not None:
+            await state.finish()
         await message.answer("Вы в главном меню", reply_markup=buttons.main_menu_authorised)
     except Exception as ex:
         await message.answer(
@@ -135,12 +138,12 @@ async def choice_date(message: types.Message):
             tg_user_id,
             name_func,
             message_from_user,
-            "Старт создания заявки на такси ",
+            "Старт создания заявки на такси",
         )
         await CreateTaxiRideRequest.date.set()
         await message.answer(
             "Выберите дату " + emoji.emojize(":calendar:") + "\nИли напишите дату в формате XX.XX",
-            reply_markup=buttons.date_keyboard,
+            reply_markup=buttons.get_date_keyboard(),
         )
     except Exception as ex:
         await message.answer(
@@ -183,7 +186,7 @@ async def process_date(message: types.Message, state: FSMContext):
             )
             await message.answer(
                 "Выберите дату " + emoji.emojize(":calendar:") + "\nИли напишите дату в формате XX.XX",
-                reply_markup=buttons.date_keyboard,
+                reply_markup=buttons.get_date_keyboard(),
             )
             await CreateTaxiRideRequest.date.set()
     except Exception as ex:
@@ -326,7 +329,10 @@ async def process_place_coming(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data["destination_place"] = message.text
         await CreateTaxiRideRequest.next()
-        await message.answer("Выберите количество мест:", reply_markup=buttons.number_of_seats_keyboard)
+        await message.answer(
+            "Выберите или введите вручную количество мест в такси (без учёта вас):",
+            reply_markup=buttons.number_of_seats_keyboard,
+        )
     except Exception as ex:
         await message.answer(
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
@@ -435,6 +441,16 @@ async def process_driver(message: types.Message, state: FSMContext):
                 message_from_user,
                 f"Заявка создана{data}(создание заявки на такси)",
             )
+            processed_name = (
+                message.from_user.first_name
+                if message.from_user.last_name is None
+                else message.from_user.first_name + "_" + message.from_user.last_name
+            )
+            processed_name = processed_name.replace(" ", "_")
+            processed_name = remove_characters_for_create_hashtag(processed_name)
+            processed_name = escape_md(processed_name)
+            if processed_name == "":
+                processed_name = "id_" + str(message.from_user.id % 10000)
             post_in_channel = await bot.send_message(
                 channel_id,
                 md.text(
@@ -443,7 +459,7 @@ async def process_driver(message: types.Message, state: FSMContext):
                         f"\n\n"
                         f"{'#' + escape_md('набор_в_такси')}"
                         f"\n"
-                        f"{'#' + escape_md(message.from_user.first_name.replace(' ', '_'))}{escape_md('_' + message.from_user.last_name.replace(' ', '_')) if message.from_user.last_name is not None else ''}"
+                        f"{'#' + processed_name}"
                         f"\n"
                         f"{'#' + escape_md('такси_дата_') + refactor_str(data['date_ride'].day if data.get('date_ride') is not None else '')}{escape_md('_')}"
                         f"{refactor_str(data['date_ride'].month if data.get('date_ride') is not None else '')}{escape_md('_')}{data['date_ride'].year if data.get('date_ride') is not None else ''}"
@@ -527,7 +543,9 @@ async def process_driver(message: types.Message, state: FSMContext):
         elif message.text == "Редактировать":
             await state.reset_state()
             await CreateTaxiRideRequest.date.set()
-            await message.answer("Выберите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.date_keyboard)
+            await message.answer(
+                "Выберите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.get_date_keyboard()
+            )
         else:
             await state.finish()
             await message.answer("Вы в главном меню:", reply_markup=buttons.main_menu_authorised)

@@ -1,12 +1,12 @@
 """
 This module handles car profile commands
 """
-# pylint:disable=broad-except
 import re
 import inspect
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 
 from src.packages.bot.filters import GroupMember, ChatWithABot, ChatWithABotCallback, GroupMemberCallback, HasCar
 from src.packages.bot.keyboards import buttons, inline_buttons
@@ -14,6 +14,30 @@ from src.packages.bot.loader import dispatcher
 from src.packages.bot.states import EditCarFSM, DeleteCarFSM
 from src.packages.database import DatabaseException, UserTable, CarTable, TelegramProfileTable
 from src.packages.logger import logger, Loggers
+
+
+@dispatcher.message_handler(Text(equals="Отмена", ignore_case=True), state="*")
+async def cancel_handler(message: types.Message, state: FSMContext):
+    """
+    This function to exit to the main menu
+    @param message: Message object
+    @param state: FSMContext object
+    """
+    try:
+        tg_user_id = message.from_user.id
+        message_from_user = message.text
+        name_func = inspect.getframeinfo(inspect.currentframe()).function
+        logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user)
+        current_state = await state.get_state()
+        if current_state is not None:
+            await state.finish()
+        await message.answer("Вы в главном меню", reply_markup=buttons.main_menu_authorised)
+    except Exception as ex:
+        await message.answer(
+            "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
+            reply_markup=buttons.main_menu_authorised,
+        )
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: cancel_handler(моя машина)")
 
 
 @dispatcher.message_handler(ChatWithABot(), GroupMember(), HasCar(), text=["Мой автомобиль"])
@@ -107,7 +131,6 @@ async def edit_start(call: types.CallbackQuery):
     except Exception as ex:
         await call.answer(
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
-            reply_markup=buttons.main_menu_authorised,
         )
         logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: edit_start(добавление авто)")
 
