@@ -216,7 +216,7 @@ async def process_time(message: types.Message, state: FSMContext):
                 data["time_ride"] = handler_time(message.text)
             await CreateTaxiRideRequest.next()
             await message.answer(
-                "Введите условие довоза",
+                "Введите или выберите условие довоза:",
                 reply_markup=buttons.keyboard_terms_delivery_taxi,
             )
         else:
@@ -263,7 +263,7 @@ async def process_terms_delivery(message: types.Message, state: FSMContext):
             data["delivery_terms"] = message.text
         await CreateTaxiRideRequest.next()
         await message.answer(
-            "Введите или выберите место отправления\nНапример: «Маркса 22»",
+            "Введите место отправления в формате: «Улица, номер дома» или выберите из предложенного:",
             reply_markup=buttons.keyboard_place_departure,
         )
     except Exception as ex:
@@ -297,7 +297,9 @@ async def process_place_departure(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data["departure_place"] = message.text
         await CreateTaxiRideRequest.next()
-        await message.answer("Введите место прибытия\nНапример: «Маркса 22»", reply_markup=buttons.default_keyboard)
+        await message.answer(
+            "Введите место прибытия в формате: «Улица, номер дома»", reply_markup=buttons.default_keyboard
+        )
     except Exception as ex:
         await message.answer(
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
