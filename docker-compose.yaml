@@ -15,8 +15,12 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-    restart: unless-stopped
     deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
       resources:
         limits:
           cpus: '1'
@@ -27,7 +31,12 @@ services:
   adminer:
     container_name: "adminer"
     image: adminer:latest
-    restart: unless-stopped
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     ports:
       - "8080:8080"
 
