@@ -7,6 +7,7 @@ from datetime import datetime
 import aiogram.utils.markdown as md
 import emoji
 from geopy import Yandex
+from geopy.exc import GeocoderTimedOut, GeocoderInsufficientPrivileges
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
@@ -105,10 +106,29 @@ def validation_number_seats(text: str):
 def create_link_maps(adress_1: str, adress_2: str):
     """The function generates a route link for two addresses"""
     # todo: обработка http исключений!
-    geolocator = Yandex(api_key=api_key_yandex_geokoder)
-    location_1 = geolocator.geocode("город Омск " + adress_1)
-    location_2 = geolocator.geocode("город Омск " + adress_2)
-    return f"https://yandex.ru/maps/?rtext={location_1.latitude},{location_1.longitude}~{location_2.latitude},{location_2.longitude}&rtt={route_type}"
+    try:
+        geolocator = Yandex(api_key=api_key_yandex_geokoder)
+        location_1 = geolocator.geocode("Омск " + adress_1)
+        location_2 = geolocator.geocode("Омск " + adress_2)
+        return f"https://yandex.ru/maps/?rtext={location_1.latitude},{location_1.longitude}~{location_2.latitude},{location_2.longitude}&rtt={route_type}"
+    except GeocoderTimedOut:
+        logger.info(
+            Loggers.INCOMING.value,
+            "Cервер API яндекс карт недоступен",
+        )
+        raise GeocoderTimedOut
+    except AttributeError:
+        logger.info(
+            Loggers.INCOMING.value,
+            "Пользователь неверно ввел адрес",
+        )
+        raise AttributeError
+    except GeocoderInsufficientPrivileges:
+        logger.warning(
+            Loggers.INCOMING.value,
+            "Неверный API/нет доступа к API/403 Forbiden",
+        )
+        raise GeocoderInsufficientPrivileges
 
 
 @dispatcher.message_handler(Text(equals="Отмена", ignore_case=True), state="*")
@@ -293,13 +313,27 @@ async def process_terms_delivery(message: types.Message, state: FSMContext):
         logger.info_from_handlers(
             Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Выбор условий довоза"
         )
-        async with state.proxy() as data:
-            data["delivery_terms"] = message.text
-        await CreateRideRequest.next()
-        await message.answer(
-            "Введите или выберите место отправления\nНапример: «Маркса 22»",
-            reply_markup=buttons.keyboard_place_departure,
-        )
+        if message.text == "Нет":
+            await message.answer(
+                "Выберите или введите вручную комфортное количество мест (без учёта вас):",
+                reply_markup=buttons.number_of_seats_keyboard,
+            )
+            await CreateRideRequest.number_of_seats.set()
+        elif message.text == "Да":
+            await CreateRideRequest.next()
+            await message.answer(
+                "Введите место отправления в формате: «Улица, номер дома» или выберите из предложенного:",
+                reply_markup=buttons.keyboard_place_departure,
+            )
+
+        else:
+            async with state.proxy() as data:
+                data["delivery_terms"] = message.text
+            await CreateRideRequest.next()
+            await message.answer(
+                "Введите место отправления в формате: «Улица, номер дома» или выберите из предложенного:",
+                reply_markup=buttons.keyboard_place_departure,
+            )
     except Exception as ex:
         await message.answer(
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
@@ -322,10 +356,13 @@ async def process_place_departure(message: types.Message, state: FSMContext):
         logger.info_from_handlers(
             Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Выбор места отправления"
         )
+
         async with state.proxy() as data:
             data["departure_place"] = message.text
         await CreateRideRequest.next()
-        await message.answer("Введите место прибытия\nНапример: «Маркса 22»", reply_markup=buttons.default_keyboard)
+        await message.answer(
+            "Введите место прибытия в формате: «Улица, номер дома»", reply_markup=buttons.default_keyboard
+        )
     except Exception as ex:
         await message.answer(
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
@@ -348,17 +385,33 @@ async def process_place_coming(message: types.Message, state: FSMContext):
         logger.info_from_handlers(
             Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Выбор места прибытия"
         )
+
         async with state.proxy() as data:
             data["destination_place"] = message.text
         async with state.proxy() as data:
-            route_link = create_link_maps(data["departure_place"], data["destination_place"])
-            data["route_link"] = route_link
-            await CreateRideRequest.next()
-            await message.answer(
-                f"Перейдите по [ссылке]({route_link}) и проверьте совпадает ли ваш маршрут с предложенным. Если совпадает нажмите да, ссылка будет прикреплена в заявке:",
-                reply_markup=buttons.yes_no_keyboard,
-                parse_mode=ParseMode.MARKDOWN,
-            )
+            try:
+                route_link = create_link_maps(data["departure_place"], data["destination_place"])
+                data["route_link"] = route_link
+                await CreateRideRequest.next()
+                await message.answer(
+                    f"Перейдите по [ссылке]({route_link}) и проверьте совпадает ли ваш маршрут с предложенным. Если совпадает нажмите да, ссылка будет прикреплена в заявке:",
+                    reply_markup=buttons.yes_no_keyboard,
+                    parse_mode=ParseMode.MARKDOWN,
+                )
+                await CreateRideRequest.route_link.set()
+            except (GeocoderTimedOut, GeocoderInsufficientPrivileges):
+                await message.answer(
+                    "Выберите или введите вручную комфортное количество мест (без учёта вас):",
+                    reply_markup=buttons.number_of_seats_keyboard,
+                )
+                await CreateRideRequest.number_of_seats.set()
+            except AttributeError:
+                await message.answer(
+                    "Неверно введено место отправления или место прибытия\nХотите снова ввести данные?",
+                    reply_markup=buttons.yes_no_keyboard,
+                )
+
+                await CreateRideRequest.delivery_terms.set()
 
     except Exception as ex:
         await message.answer(
@@ -380,20 +433,30 @@ async def process_route_link(message: types.Message, state: FSMContext):
         message_from_user = message.text
         name_func = inspect.getframeinfo(inspect.currentframe()).function
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Ссылка на маршрут")
-        async with state.proxy() as data:
-            data["route_link"] = data["route_link"] if message.text == "Да" else ""
-            logger.info_from_handlers(
-                Loggers.INCOMING.value,
-                tg_user_id,
-                name_func,
-                message_from_user,
-                f"Ссылка на маршрут {data['route_link']} { '' if message.text == 'Да' else 'не'} добавлена к заявке",
+        if message.text == "Изменить адрес":
+            async with state.proxy() as data:
+                if data.get("route_link") is not None:
+                    del data["route_link"]
+            await message.answer(
+                "Введите место отправления в формате: «Улица, номер дома» или выберите из предложенного:",
+                reply_markup=buttons.keyboard_place_departure,
             )
-        await CreateRideRequest.next()
-        await message.answer(
-            "Выберите или введите вручную комфортное количество мест (без учёта вас):",
-            reply_markup=buttons.number_of_seats_keyboard,
-        )
+            await CreateRideRequest.place_departure.set()
+        else:
+            async with state.proxy() as data:
+                data["route_link"] = data["route_link"] if message.text == "Да" else ""
+                logger.info_from_handlers(
+                    Loggers.INCOMING.value,
+                    tg_user_id,
+                    name_func,
+                    message_from_user,
+                    f"Ссылка на маршрут {data['route_link']} { '' if message.text == 'Да' else 'не'} добавлена к заявке",
+                )
+            await CreateRideRequest.next()
+            await message.answer(
+                "Выберите или введите вручную комфортное количество мест (без учёта вас):",
+                reply_markup=buttons.number_of_seats_keyboard,
+            )
     except Exception as ex:
         await message.answer(
             "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
@@ -449,12 +512,14 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
                         f'{md.bold("🅱 Место прибытия:")}\n{escape_md(data["destination_place"]) if data.get("destination_place") is not None else ""}'
                     ),
                     md.text(
-                        f'🚩Для уточнения маршрута перейдите по [ссылке]({data["route_link"]})'
-                        if len(data.get("route_link")) > 0
-                        else ""
+                        f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}\n'
                     ),
                     md.text(
-                        f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
+                        f'🚩Для уточнения маршрута перейдите по [ссылке]({data["route_link"]})'
+                        if data.get("route_link") is not None
+                        and data.get("route_link")
+                        and len(data.get("route_link")) > 0
+                        else ""
                     ),
                     sep="\n",
                 ),
@@ -531,12 +596,14 @@ async def process_driver(message: types.Message, state: FSMContext):
                         f'{md.bold("🅱 Место прибытия: ")}\n{escape_md(data["destination_place"]) if data.get("destination_place") is not None else ""}'
                     ),
                     md.text(
-                        f'🚩Для уточнения маршрута перейдите по [ссылке]({data["route_link"]})'
-                        if len(data.get("route_link")) > 0
-                        else ""
+                        f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}\n'
                     ),
                     md.text(
-                        f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
+                        f'🚩Для уточнения маршрута перейдите по [ссылке]({data["route_link"]})'
+                        if data.get("route_link") is not None
+                        and data.get("route_link")
+                        and len(data.get("route_link")) > 0
+                        else ""
                     ),
                     sep="\n",
                 ),
@@ -603,19 +670,23 @@ async def process_driver(message: types.Message, state: FSMContext):
                         f'{md.bold("🅱 Место прибытия: ")}\n{escape_md(data["destination_place"]) if data.get("destination_place") is not None else ""}'
                     ),
                     md.text(
-                        f'🚩Для уточнения маршрута перейдите по [ссылке]({data["route_link"]})'
-                        if len(data.get("route_link")) > 0
-                        else ""
+                        f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}\n'
                     ),
                     md.text(
-                        f'{md.bold("Количество мест: ")}{data["seats_number"] if data.get("seats_number") is not None else ""}'
+                        f'🚩Для уточнения маршрута перейдите по [ссылке]({data["route_link"]})'
+                        if data.get("route_link") is not None
+                        and data.get("route_link")
+                        and len(data.get("route_link")) > 0
+                        else ""
                     ),
                     md.text(f"\nОтправить свою заявку вы можете при помощи бота: {escape_md(bot_link)}"),
                     sep="\n",
                 ),
                 parse_mode=ParseMode.MARKDOWN,
             )
-            del data["route_link"]
+
+            if data.get("route_link") is not None:
+                del data["route_link"]
             await RideRequestTable.add(post_message_id=post_in_channel.message_id, **data)
 
         elif message.text == "Редактировать":
