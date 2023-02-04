@@ -81,6 +81,6 @@ time_keyboard = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 yes_no_keyboard = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Да"), KeyboardButton("Нет")]],
+    keyboard=[[KeyboardButton("Да"), KeyboardButton("Нет")], [KeyboardButton("Изменить адрес")]],
     resize_keyboard=True,
 )
