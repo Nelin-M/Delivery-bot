@@ -103,13 +103,12 @@ def validation_number_seats(text: str):
     return 0 < int(text) < 8
 
 
-def create_link_maps(adress_1: str, adress_2: str):
+def create_link_maps(address_1: str, address_2: str):
     """The function generates a route link for two addresses"""
-    # todo: обработка http исключений!
     try:
         geolocator = Yandex(api_key=api_key_yandex_geokoder)
-        location_1 = geolocator.geocode("Омск " + adress_1)
-        location_2 = geolocator.geocode("Омск " + adress_2)
+        location_1 = geolocator.geocode("Омск " + address_1)
+        location_2 = geolocator.geocode("Омск " + address_2)
         return f"https://yandex.ru/maps/?rtext={location_1.latitude},{location_1.longitude}~{location_2.latitude},{location_2.longitude}&rtt={route_type}"
     except GeocoderTimedOut:
         logger.info(
@@ -313,7 +312,7 @@ async def process_terms_delivery(message: types.Message, state: FSMContext):
         logger.info_from_handlers(
             Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Выбор условий довоза"
         )
-        if message.text == "Нет":
+        if message.text == "Не прикреплять ссылку":
             await message.answer(
                 "Выберите или введите вручную комфортное количество мест (без учёта вас):",
                 reply_markup=buttons.number_of_seats_keyboard,
@@ -394,7 +393,7 @@ async def process_place_coming(message: types.Message, state: FSMContext):
                 data["route_link"] = route_link
                 await CreateRideRequest.next()
                 await message.answer(
-                    f"Перейдите по [ссылке]({route_link}) и проверьте совпадает ли ваш маршрут с предложенным. Если совпадает нажмите да, ссылка будет прикреплена в заявке:",
+                    f"Перейдите по [ссылке]({route_link}) и проверьте, совпадает ли ваш маршрут с предложенным. Если совпадает, то нажмите да, ссылка будет прикреплена к заявке",
                     reply_markup=buttons.yes_no_keyboard,
                     parse_mode=ParseMode.MARKDOWN,
                 )
@@ -410,7 +409,6 @@ async def process_place_coming(message: types.Message, state: FSMContext):
                     "Неверно введено место отправления или место прибытия\nХотите снова ввести данные?",
                     reply_markup=buttons.yes_no_keyboard,
                 )
-
                 await CreateRideRequest.delivery_terms.set()
 
     except Exception as ex:
