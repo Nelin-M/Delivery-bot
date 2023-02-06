@@ -448,9 +448,9 @@ async def process_driver(message: types.Message, state: FSMContext):
             )
             processed_name = processed_name.replace(" ", "_")
             processed_name = remove_characters_for_create_hashtag(processed_name)
-            processed_name = escape_md(processed_name)
             if processed_name == "":
                 processed_name = "id_" + str(message.from_user.id % 10000)
+            processed_name = escape_md(processed_name)
             post_in_channel = await bot.send_message(
                 channel_id,
                 md.text(
