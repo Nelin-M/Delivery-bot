@@ -1,43 +1,21 @@
 """
 This module represents car profile ReplyKeyboards
 """
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from src.packages.bot.keyboards.UtilsButtons import ReplyResizeKeyboardAndOneTimeList
 
-add_car_menu = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Добавить автомобиль")]],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-)
+add_car_menu = ReplyResizeKeyboardAndOneTimeList(["Добавить автомобиль"])
 
-car_added_menu = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton("Редактировать автомобиль"), KeyboardButton("Удалить автомобиль")],
-        [KeyboardButton("Отмена")],
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-)
+car_added_menu = ReplyResizeKeyboardAndOneTimeList(["Редактировать автомобиль", "Удалить автомобиль"],
+                                                   cancel_button=True)
 
-car_create_confirmation_keyboard = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Всё верно"), KeyboardButton("Хочу исправить")], [KeyboardButton("Отмена")]],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-)
+car_create_confirmation_keyboard = ReplyResizeKeyboardAndOneTimeList(["Всё верно", "Хочу исправить"],
+                                                                     cancel_button=True)
 
-car_delete_confirmation = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Да"), KeyboardButton("Отменить")]], resize_keyboard=True, one_time_keyboard=True
-)
+car_delete_confirmation = ReplyResizeKeyboardAndOneTimeList(["Да", "Отменить"])
 
-car_edit_cancel = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Отмена")]], resize_keyboard=True, one_time_keyboard=True
-)
+car_edit_cancel = ReplyResizeKeyboardAndOneTimeList(["Отмена"])
 
-car_create_confirmation_keyboard = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Всё верно"), KeyboardButton("Хочу исправить")], [KeyboardButton("Отмена")]],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-)
+car_create_confirmation_keyboard = ReplyResizeKeyboardAndOneTimeList(["Всё верно", "Хочу исправить"],
+                                                                     cancel_button=True)
 
-car_delete_confirmation = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Да"), KeyboardButton("Отменить")]], resize_keyboard=True, one_time_keyboard=True
-)
+car_delete_confirmation = ReplyResizeKeyboardAndOneTimeList(["Да", "Отменить"])

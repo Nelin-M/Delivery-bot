@@ -1,21 +1,10 @@
 """
 Keyboard for the main menu
 """
+from src.packages.bot.keyboards.UtilsButtons import ReplyResizeKeyboardAndOneTimeList
 
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+main_menu_authorised = ReplyResizeKeyboardAndOneTimeList(["Создать заявку", "Такси", "Мои заявки",
+                                                          "Мой автомобиль", "Обратная связь", "Пожаловаться",
+                                                          "Назад"], 3)
 
-
-main_menu_authorised = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton("Создать заявку"), KeyboardButton("Такси"), KeyboardButton("Мои заявки")],
-        [KeyboardButton("Мой автомобиль"), KeyboardButton("Обратная связь"), KeyboardButton("Пожаловаться")],
-        [KeyboardButton("Назад")],
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-)
-
-
-main_menu_unauthorised = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Создать профиль")]], resize_keyboard=True, one_time_keyboard=True
-)
+main_menu_unauthorised = ReplyResizeKeyboardAndOneTimeList(["Создать профиль"], 3)

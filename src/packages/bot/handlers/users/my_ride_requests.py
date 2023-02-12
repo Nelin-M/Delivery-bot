@@ -1,38 +1,21 @@
 """
 This module handles users commands
 """
+import aiogram.utils.markdown as md
 # pylint:disable=broad-except
 import inspect
 from aiogram import types
 from aiogram.types import ParseMode, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
-import aiogram.utils.markdown as md
 from aiogram.utils.exceptions import MessageCantBeDeleted
-from src.packages.bot.keyboards import buttons
-from src.packages.database import DatabaseException
-from src.packages.loaders import env_variables
+
 from src.packages.bot.filters import GroupMember, ChatWithABot
+from src.packages.bot.keyboards import buttons
 from src.packages.bot.loader import dispatcher, bot
+from src.packages.bot.other.Utils import escape_md, refactor_str
+from src.packages.database import DatabaseException
 from src.packages.database import UserTable, RideRequestTable
+from src.packages.loaders import env_variables
 from src.packages.logger import logger, Loggers
-
-
-def escape_md(text: str or int):
-    # todo: найти аналог в библиотеке
-    text = str(text)
-    text = text.replace("_", "\\_")
-    text = text.replace("*", "\\*")
-    text = text.replace("`", "\\`")
-    text = text.replace("~", "\\~")
-    text = text.replace("|", "\\|")
-    return text
-
-
-def refactor_str(str_input: str or int):
-    """
-    This function refactor string
-    """
-    str_input = str(str_input)
-    return f"{str_input if len(str_input) == 2 else '0' + str_input}"
 
 
 def get_inline_delete_button(ride_request_id: int):

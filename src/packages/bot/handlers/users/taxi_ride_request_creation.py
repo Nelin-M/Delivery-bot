@@ -12,6 +12,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram.types import ParseMode
 from src.packages.bot.filters import GroupMember, ChatWithABot
 from src.packages.bot.keyboards import buttons
+from src.packages.bot.keyboards import get_date_keyboard
 from src.packages.bot.loader import dispatcher, bot
 from src.packages.bot.states import CreateTaxiRideRequest
 from src.packages.database import UserTable, RideRequestTable
@@ -143,7 +144,7 @@ async def choice_date(message: types.Message):
         await CreateTaxiRideRequest.date.set()
         await message.answer(
             "Выберите дату " + emoji.emojize(":calendar:") + "\nИли напишите дату в формате XX.XX",
-            reply_markup=buttons.get_date_keyboard(),
+            reply_markup=get_date_keyboard(),
         )
     except Exception as ex:
         await message.answer(
@@ -186,7 +187,7 @@ async def process_date(message: types.Message, state: FSMContext):
             )
             await message.answer(
                 "Выберите дату " + emoji.emojize(":calendar:") + "\nИли напишите дату в формате XX.XX",
-                reply_markup=buttons.get_date_keyboard(),
+                reply_markup=get_date_keyboard(),
             )
             await CreateTaxiRideRequest.date.set()
     except Exception as ex:
@@ -546,7 +547,7 @@ async def process_driver(message: types.Message, state: FSMContext):
             await state.reset_state()
             await CreateTaxiRideRequest.date.set()
             await message.answer(
-                "Выберите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.get_date_keyboard()
+                "Выберите дату " + emoji.emojize(":calendar:"), reply_markup=get_date_keyboard()
             )
         else:
             await state.finish()

@@ -1,21 +1,24 @@
 """
 This module for creating ride request
 """
-import inspect
-import re
-from datetime import datetime
 import aiogram.utils.markdown as md
 import emoji
-from geopy import Yandex
-from geopy.exc import GeocoderTimedOut, GeocoderInsufficientPrivileges
+import inspect
+import re
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ParseMode
+from datetime import datetime
+from geopy import Yandex
+from geopy.exc import GeocoderTimedOut, GeocoderInsufficientPrivileges
 
 from src.packages.bot.filters import GroupMember, ChatWithABot, HasCar
 from src.packages.bot.keyboards import buttons
+from src.packages.bot.keyboards import get_date_keyboard
 from src.packages.bot.loader import dispatcher, bot
+from src.packages.bot.other.Utils import escape_md, remove_characters_for_create_hashtag, refactor_str, validation_time, \
+    validation_number_seats
 from src.packages.bot.states import CreateRideRequest
 from src.packages.database import UserTable, RideRequestTable, CarTable
 from src.packages.loaders import env_variables
@@ -26,29 +29,6 @@ channel_link = env_variables.get("CHANNEL_LINK")
 bot_link = env_variables.get("BOT_LINK")
 api_key_yandex_geokoder = env_variables.get("API_KEY_YANDEX_GEOKODER")
 route_type = "auto"
-
-
-def remove_characters_for_create_hashtag(text: str):
-    return re.sub(r"[^a-zA-Zа-яА-я0-9_]", "", text)
-
-
-def escape_md(text: str or int):
-    # todo: найти аналог в библиотеке aiogram
-    text = str(text)
-    text = text.replace("_", "\\_")
-    text = text.replace("*", "\\*")
-    text = text.replace("`", "\\`")
-    text = text.replace("~", "\\~")
-    text = text.replace("|", "\\|")
-    return text
-
-
-def refactor_str(str_input: str or int):
-    """
-    This function refactor string
-    """
-    str_input = str(str_input)
-    return f"{str_input if len(str_input) == 2 else '0' + str_input}"
 
 
 def handler_date(str_date: str):
@@ -79,28 +59,6 @@ def validation_date(text: str):
         return True
     except ValueError:
         return False
-
-
-def validation_time(text: str):
-    """
-    This function validates the time entered by the user
-    """
-    try:
-        datetime.strptime(text, "%H:%M")
-        return True
-    except ValueError:
-        return False
-
-
-def validation_number_seats(text: str):
-    """
-    This function validates the number_seats entered by the user
-    """
-    try:
-        text = int(text)
-    except ValueError:
-        return False
-    return 0 < int(text) < 8
 
 
 def create_link_maps(address_1: str, address_2: str):
@@ -174,7 +132,7 @@ async def choice_date(message: types.Message):
         await CreateRideRequest.date.set()
         await message.answer(
             "Выберите дату " + emoji.emojize(":calendar:") + "\nИли напишите дату в формате XX.XX",
-            reply_markup=buttons.get_date_keyboard(),
+            reply_markup=get_date_keyboard(),
         )
     except Exception as ex:
         await message.answer(
@@ -244,7 +202,7 @@ async def process_date(message: types.Message, state: FSMContext):
             )
             await message.answer(
                 "Выберите дату " + emoji.emojize(":calendar:") + "\nИли напишите дату в формате XX.XX",
-                reply_markup=buttons.get_date_keyboard(),
+                reply_markup=get_date_keyboard(),
             )
             await CreateRideRequest.date.set()
     except Exception as ex:
@@ -448,7 +406,7 @@ async def process_route_link(message: types.Message, state: FSMContext):
                     tg_user_id,
                     name_func,
                     message_from_user,
-                    f"Ссылка на маршрут {data['route_link']} { '' if message.text == 'Да' else 'не'} добавлена к заявке",
+                    f"Ссылка на маршрут {data['route_link']} {'' if message.text == 'Да' else 'не'} добавлена к заявке",
                 )
             await CreateRideRequest.next()
             await message.answer(
@@ -515,8 +473,8 @@ async def process_number_of_seats(message: types.Message, state: FSMContext):
                     md.text(
                         f'🚩Для уточнения маршрута перейдите по [ссылке]({data["route_link"]})'
                         if data.get("route_link") is not None
-                        and data.get("route_link")
-                        and len(data.get("route_link")) > 0
+                           and data.get("route_link")
+                           and len(data.get("route_link")) > 0
                         else ""
                     ),
                     sep="\n",
@@ -599,8 +557,8 @@ async def process_driver(message: types.Message, state: FSMContext):
                     md.text(
                         f'🚩Для уточнения маршрута перейдите по [ссылке]({data["route_link"]})'
                         if data.get("route_link") is not None
-                        and data.get("route_link")
-                        and len(data.get("route_link")) > 0
+                           and data.get("route_link")
+                           and len(data.get("route_link")) > 0
                         else ""
                     ),
                     sep="\n",
@@ -673,8 +631,8 @@ async def process_driver(message: types.Message, state: FSMContext):
                     md.text(
                         f'🚩Для уточнения маршрута перейдите по [ссылке]({data["route_link"]})'
                         if data.get("route_link") is not None
-                        and data.get("route_link")
-                        and len(data.get("route_link")) > 0
+                           and data.get("route_link")
+                           and len(data.get("route_link")) > 0
                         else ""
                     ),
                     md.text(f"\nОтправить свою заявку вы можете при помощи бота: {escape_md(bot_link)}"),
@@ -691,7 +649,7 @@ async def process_driver(message: types.Message, state: FSMContext):
             await state.reset_state()
             await CreateRideRequest.date.set()
             await message.answer(
-                "Выберите дату " + emoji.emojize(":calendar:"), reply_markup=buttons.get_date_keyboard()
+                "Выберите дату " + emoji.emojize(":calendar:"), reply_markup=get_date_keyboard()
             )
         else:
             await state.finish()

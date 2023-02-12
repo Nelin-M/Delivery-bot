@@ -10,7 +10,6 @@ from .my_car import add_car_menu
 from .my_car import car_create_confirmation_keyboard
 from .my_car import car_delete_confirmation
 from .my_car import car_edit_cancel
-from .ride_request_creation import get_date_keyboard
 from .ride_request_creation import time_keyboard
 from .ride_request_creation import default_keyboard
 from .ride_request_creation import keyboard_place_departure
@@ -30,7 +29,6 @@ __all__ = [
     "car_create_confirmation_keyboard",
     "car_delete_confirmation",
     "car_edit_cancel",
-    "get_date_keyboard",
     "time_keyboard",
     "keyboard_ok",
     "default_keyboard",
@@ -39,5 +37,5 @@ __all__ = [
     "keyboard_place_departure",
     "keyboard_main_profile",
     "yes_no_keyboard",
-    "keyboard_terms_delivery_taxi",
+    "keyboard_terms_delivery_taxi"
 ]
