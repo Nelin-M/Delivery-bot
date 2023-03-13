@@ -3,7 +3,7 @@ This module for creating ride request
 """
 import inspect
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import aiogram.utils.markdown as md
 import emoji
 from geopy import Yandex
@@ -101,6 +101,13 @@ def validation_number_seats(text: str):
     except ValueError:
         return False
     return 0 < int(text) < 8
+
+
+def validate_date_three(date_obj):
+    """
+    This function date validation so that the date is less than 3 days old
+    """
+    return date_obj <= datetime.now().date() + timedelta(days=2)
 
 
 def create_link_maps(address_1: str, address_2: str):
@@ -225,7 +232,7 @@ async def process_date(message: types.Message, state: FSMContext):
         message_from_user = message.text
         name_func = inspect.getframeinfo(inspect.currentframe()).function
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Выбор даты")
-        if validation_date(message.text):
+        if validation_date(message.text) and validate_date_three(handler_date(message.text)):
             async with state.proxy() as data:
                 data["date_ride"] = handler_date(message.text)
             await CreateRideRequest.next()
@@ -234,7 +241,7 @@ async def process_date(message: types.Message, state: FSMContext):
                 reply_markup=buttons.time_keyboard,
             )
         else:
-            await message.reply("Вы указали дату в неверном формате!")
+            await message.reply("Максимальная дата заявки 3 дня вместе с текущим, выберите дату из предложенных")
             logger.info_from_handlers(
                 Loggers.INCOMING.value,
                 tg_user_id,
@@ -448,7 +455,7 @@ async def process_route_link(message: types.Message, state: FSMContext):
                     tg_user_id,
                     name_func,
                     message_from_user,
-                    f"Ссылка на маршрут {data['route_link']} { '' if message.text == 'Да' else 'не'} добавлена к заявке",
+                    f"Ссылка на маршрут {data['route_link']} {'' if message.text == 'Да' else 'не'} добавлена к заявке",
                 )
             await CreateRideRequest.next()
             await message.answer(
