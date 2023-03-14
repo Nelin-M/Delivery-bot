@@ -28,7 +28,7 @@ def str_button(days: int):
 def get_date_keyboard():
     date_keyboard = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(str_button(0)), KeyboardButton(str_button(1)), KeyboardButton(str_button(2))],
+            [KeyboardButton(str_button(i)) for i in range(0, 3)],
             [KeyboardButton("Отмена")],
         ],
         resize_keyboard=True,
