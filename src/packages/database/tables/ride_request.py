@@ -74,6 +74,34 @@ class RideRequestTable:
         user_ride_requests = await RideRequest.query.where(RideRequest.author == user_id).gino.all()
         return user_ride_requests
 
+    @staticmethod
+    async def get_user_ride_request_last_departure_place(user_id: int) -> str or None:
+        """
+        This method returns str (departure_place) or None if the user has no requests
+        @param user_id: User ID
+        @return: str(departure_place) or None
+        """
+        user_ride_requests = (
+            await RideRequest.query.where(RideRequest.author == user_id).order_by(RideRequest.id.desc()).gino.first()
+        )
+        if user_ride_requests is not None:
+            return user_ride_requests.departure_place
+        return None
+
+    @staticmethod
+    async def get_user_ride_request_last_destination_place(user_id: int) -> str or None:
+        """
+        This method returns str (destination_place) or None if the user has no requests
+        @param user_id: User ID
+        @return: str(destination_place) or None
+        """
+        user_ride_requests = (
+            await RideRequest.query.where(RideRequest.author == user_id).order_by(RideRequest.id.desc()).gino.first()
+        )
+        if user_ride_requests is not None:
+            return user_ride_requests.destination_place
+        return None
+
     @classmethod
     async def update(cls, ride_request_id: int, data: dict):
         """

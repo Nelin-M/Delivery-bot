@@ -14,6 +14,7 @@ class CreateRideRequest(StatesGroup):
     delivery_terms = State()
     place_departure = State()
     place_coming = State()
+    place_departure_update = State()
     route_link = State()
     number_of_seats = State()
     driver = State()

@@ -20,6 +20,8 @@ from .ride_request_creation import keyboard_ok
 from .ride_request_creation import keyboard_main_profile
 from .ride_request_creation import yes_no_keyboard
 from .taxi_ride_request_creation import keyboard_terms_delivery_taxi
+from .ride_request_creation import create_dinamic_keyboard
+from .ride_request_creation import create_dinamic_default_keyboard
 
 
 __all__ = [
@@ -40,4 +42,6 @@ __all__ = [
     "keyboard_main_profile",
     "yes_no_keyboard",
     "keyboard_terms_delivery_taxi",
+    "create_dinamic_keyboard",
+    "create_dinamic_default_keyboard",
 ]
