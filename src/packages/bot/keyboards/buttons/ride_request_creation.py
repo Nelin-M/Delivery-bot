@@ -7,6 +7,28 @@ import emoji
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 
+def create_dinamic_keyboard(text):
+    """
+    This function returns the keyboard for departure
+    """
+    if text is not None and text != "ул.Звездова 101 A":
+        keyboard = [[KeyboardButton(text="ул.Звездова 101 A")], [KeyboardButton(text=text)], [KeyboardButton("Отмена")]]
+    else:
+        keyboard = [[KeyboardButton(text="ул.Звездова 101 A")], [KeyboardButton("Отмена")]]
+    return ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True)
+
+
+def create_dinamic_default_keyboard(text):
+    """
+    This function returns the keyboard for comming
+    """
+    if text is not None:
+        keyboard = [[KeyboardButton(text=text)], [KeyboardButton("Отмена")]]
+    else:
+        keyboard = [[KeyboardButton("Отмена")]]
+    return ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True)
+
+
 def handle_date(days: int):
     """
     This function returns the current date plus days
@@ -81,6 +103,11 @@ time_keyboard = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 yes_no_keyboard = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton("Да"), KeyboardButton("Не прикреплять ссылку")], [KeyboardButton("Изменить адрес")]],
+    keyboard=[
+        [KeyboardButton("Да"), KeyboardButton("Не прикреплять ссылку")],
+        [KeyboardButton("Изменить место отправления")],
+        [KeyboardButton("Изменить место прибытия")],
+        [KeyboardButton("Отмена")],
+    ],
     resize_keyboard=True,
 )

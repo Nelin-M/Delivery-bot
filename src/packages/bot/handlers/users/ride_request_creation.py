@@ -172,6 +172,7 @@ async def choice_date(message: types.Message):
             "Старт создания заявки(у пользователя есть авто)",
         )
         await CreateRideRequest.date.set()
+
         await message.answer(
             "Выберите дату " + emoji.emojize(":calendar:") + "\nИли напишите дату в формате XX.XX",
             reply_markup=buttons.get_date_keyboard(),
@@ -320,18 +321,21 @@ async def process_terms_delivery(message: types.Message, state: FSMContext):
             await CreateRideRequest.number_of_seats.set()
         elif message.text == "Да":
             await CreateRideRequest.next()
+            user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
+            text = await RideRequestTable.get_user_ride_request_last_departure_place(user_from_db.id)
             await message.answer(
                 "Введите место отправления в формате: «Улица, номер дома» или выберите из предложенного:",
-                reply_markup=buttons.keyboard_place_departure,
+                reply_markup=buttons.create_dinamic_keyboard(text),
             )
-
         else:
             async with state.proxy() as data:
                 data["delivery_terms"] = message.text
             await CreateRideRequest.next()
+            user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
+            text = await RideRequestTable.get_user_ride_request_last_departure_place(user_from_db.id)
             await message.answer(
                 "Введите место отправления в формате: «Улица, номер дома» или выберите из предложенного:",
-                reply_markup=buttons.keyboard_place_departure,
+                reply_markup=buttons.create_dinamic_keyboard(text),
             )
     except Exception as ex:
         await message.answer(
@@ -359,8 +363,11 @@ async def process_place_departure(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data["departure_place"] = message.text
         await CreateRideRequest.next()
+        user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
+        text = await RideRequestTable.get_user_ride_request_last_destination_place(user_from_db.id)
         await message.answer(
-            "Введите место прибытия в формате: «Улица, номер дома»", reply_markup=buttons.default_keyboard
+            "Введите место прибытия в формате: «Улица, номер дома»",
+            reply_markup=buttons.create_dinamic_default_keyboard(text),
         )
     except Exception as ex:
         await message.answer(
@@ -419,6 +426,55 @@ async def process_place_coming(message: types.Message, state: FSMContext):
         logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_place_coming(создание заявки)")
 
 
+@dispatcher.message_handler(state=CreateRideRequest.place_departure_update)
+async def place_departure_update(message: types.Message, state: FSMContext):
+    """
+    This function update departure place and transition in state route_link
+    @param message: Message object
+    @param state: FSMContext object
+    """
+    try:
+        tg_user_id = message.from_user.id
+        message_from_user = message.text
+        name_func = inspect.getframeinfo(inspect.currentframe()).function
+        logger.info_from_handlers(
+            Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Исправление места отправления"
+        )
+
+        async with state.proxy() as data:
+            data["departure_place"] = message.text
+        async with state.proxy() as data:
+            try:
+                route_link = create_link_maps(data["departure_place"], data["destination_place"])
+                data["route_link"] = route_link
+                await CreateRideRequest.next()
+                await message.answer(
+                    f"Перейдите по [ссылке]({route_link}) и проверьте, совпадает ли ваш маршрут с предложенным. Если совпадает, то нажмите да, ссылка будет прикреплена к заявке",
+                    reply_markup=buttons.yes_no_keyboard,
+                    parse_mode=ParseMode.MARKDOWN,
+                )
+                await CreateRideRequest.route_link.set()
+            except (GeocoderTimedOut, GeocoderInsufficientPrivileges):
+                await message.answer(
+                    "Выберите или введите вручную комфортное количество мест (без учёта вас):",
+                    reply_markup=buttons.number_of_seats_keyboard,
+                )
+                await CreateRideRequest.number_of_seats.set()
+            except AttributeError:
+                await message.answer(
+                    "Неверно введено место отправления или место прибытия\nХотите снова ввести данные?",
+                    reply_markup=buttons.yes_no_keyboard,
+                )
+                await CreateRideRequest.delivery_terms.set()
+
+    except Exception as ex:
+        await message.answer(
+            "По техническим причинам, мы не смогли обработать ваш запрос, попробуйте позже",
+            reply_markup=buttons.main_menu_authorised,
+        )
+        logger.critical(Loggers.APP.value, f"Ошибка {str(ex)}, функция: process_place_coming(создание заявки)")
+
+
 @dispatcher.message_handler(state=CreateRideRequest.route_link)
 async def process_route_link(message: types.Message, state: FSMContext):
     """
@@ -431,15 +487,28 @@ async def process_route_link(message: types.Message, state: FSMContext):
         message_from_user = message.text
         name_func = inspect.getframeinfo(inspect.currentframe()).function
         logger.info_from_handlers(Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Ссылка на маршрут")
-        if message.text == "Изменить адрес":
+        if message.text == "Изменить место отправления":
             async with state.proxy() as data:
                 if data.get("route_link") is not None:
                     del data["route_link"]
+            user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
+            text = await RideRequestTable.get_user_ride_request_last_departure_place(user_from_db.id)
             await message.answer(
                 "Введите место отправления в формате: «Улица, номер дома» или выберите из предложенного:",
-                reply_markup=buttons.keyboard_place_departure,
+                reply_markup=buttons.create_dinamic_keyboard(text),
             )
-            await CreateRideRequest.place_departure.set()
+            await CreateRideRequest.place_departure_update.set()
+        elif message.text == "Изменить место прибытия":
+            async with state.proxy() as data:
+                if data.get("route_link") is not None:
+                    del data["route_link"]
+            user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
+            text = await RideRequestTable.get_user_ride_request_last_destination_place(user_from_db.id)
+            await message.answer(
+                "Введите место прибытия в формате: «Улица, номер дома»",
+                reply_markup=buttons.create_dinamic_default_keyboard(text),
+            )
+            await CreateRideRequest.place_coming.set()
         else:
             async with state.proxy() as data:
                 data["route_link"] = data["route_link"] if message.text == "Да" else ""
@@ -448,7 +517,7 @@ async def process_route_link(message: types.Message, state: FSMContext):
                     tg_user_id,
                     name_func,
                     message_from_user,
-                    f"Ссылка на маршрут {data['route_link']} { '' if message.text == 'Да' else 'не'} добавлена к заявке",
+                    f"Ссылка на маршрут {data['route_link']} {'' if message.text == 'Да' else 'не'} добавлена к заявке",
                 )
             await CreateRideRequest.next()
             await message.answer(

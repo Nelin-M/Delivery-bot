@@ -3,7 +3,7 @@ This module for creating taxi ride request
 """
 import inspect
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import aiogram.utils.markdown as md
 import emoji
 from aiogram import types
@@ -98,6 +98,13 @@ def validation_number_seats(text: str):
     return 0 < int(text) < 8
 
 
+def validate_date_three(date_obj):
+    """
+    This function date validation so that the date is less than 3 days old
+    """
+    return date_obj <= datetime.now().date() + timedelta(days=2)
+
+
 @dispatcher.message_handler(state="*", commands="Отмена")
 @dispatcher.message_handler(Text(equals="отмена", ignore_case=True), state="*")
 async def cancel_handler(message: types.Message, state: FSMContext):
@@ -167,7 +174,7 @@ async def process_date(message: types.Message, state: FSMContext):
         logger.info_from_handlers(
             Loggers.INCOMING.value, tg_user_id, name_func, message_from_user, "Выбор даты(создание заявки на такси)"
         )
-        if validation_date(message.text):
+        if validation_date(message.text) and validate_date_three(handler_date(message.text)):
             async with state.proxy() as data:
                 data["date_ride"] = handler_date(message.text)
             await CreateTaxiRideRequest.next()
@@ -176,7 +183,7 @@ async def process_date(message: types.Message, state: FSMContext):
                 reply_markup=buttons.time_keyboard,
             )
         else:
-            await message.reply("Вы указали дату в неверном формате!")
+            await message.reply("Максимальная дата заявки 3 дня вместе с текущим, выберите дату из предложенных")
             logger.warning_from_handlers(
                 Loggers.INCOMING.value,
                 tg_user_id,
@@ -262,9 +269,11 @@ async def process_terms_delivery(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data["delivery_terms"] = message.text
         await CreateTaxiRideRequest.next()
+        user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
+        text = await RideRequestTable.get_user_ride_request_last_departure_place(user_from_db.id)
         await message.answer(
             "Введите место отправления в формате: «Улица, номер дома» или выберите из предложенного:",
-            reply_markup=buttons.keyboard_place_departure,
+            reply_markup=buttons.create_dinamic_keyboard(text),
         )
     except Exception as ex:
         await message.answer(
@@ -297,8 +306,11 @@ async def process_place_departure(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data["departure_place"] = message.text
         await CreateTaxiRideRequest.next()
+        user_from_db = await UserTable.get_by_telegram_id(message.from_user.id)
+        text = await RideRequestTable.get_user_ride_request_last_destination_place(user_from_db.id)
         await message.answer(
-            "Введите место прибытия в формате: «Улица, номер дома»", reply_markup=buttons.default_keyboard
+            "Введите место прибытия в формате: «Улица, номер дома»",
+            reply_markup=buttons.create_dinamic_default_keyboard(text),
         )
     except Exception as ex:
         await message.answer(
